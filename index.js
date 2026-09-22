@@ -102,14 +102,14 @@ if (!settings.footer) {
 }
 if (!settings.welcomeImages || !Array.isArray(settings.welcomeImages) || settings.welcomeImages.length === 0) {
   settings.welcomeImages = [
-    'https://h.uguu.se/fMtUzozP.jpg'
+    'https://i.postimg.cc/NFtJHrzs/tyrex.png'
   ];
 }
 if (!settings.channelId) {
   settings.channelId = process.env.NEWSLETTER_JID || '120363429539292697@newsletter';
 }
 
-const { handleMessages, handleGroupParticipantUpdate } = require('./main');
+const { handleMessages, handleGroupParticipantUpdate, handleGroupMetadataUpdate } = require('./main');
 const PhoneNumber = require('awesome-phonenumber');
 const { sleep } = require('./lib/myfunc');
 const mode = require('./lib/mode');
@@ -1134,6 +1134,10 @@ ${settings.footer}`;
 
     Tyrex.ev.on('group-participants.update', async (update) => {
       await handleGroupParticipantUpdate(Tyrex, update);
+    });
+
+    Tyrex.ev.on('groups.update', async (updates) => {
+      await handleGroupMetadataUpdate(Tyrex, updates);
     });
 
     return Tyrex;
