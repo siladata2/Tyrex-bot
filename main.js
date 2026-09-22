@@ -501,13 +501,33 @@ async function handleGroupParticipantUpdate(conn, update) {
     } catch (e) {
       console.log('[ANTIDEMOTE] Hook error:', e.message);
     }
+
+    try {
+      const groupEvents = require('./lib/groupevents');
+      await groupEvents.handleParticipantsEvent(conn, update);
+    } catch (e) {
+      console.log('[GROUPEVENTS] Hook error:', e.message);
+    }
   } catch (error) {
     logger.error(`Group update error: ${error.message}`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// GROUP METADATA UPDATE (name/description/settings/icon)
+// ═══════════════════════════════════════════════════════
+async function handleGroupMetadataUpdate(conn, updates) {
+  try {
+    const groupEvents = require('./lib/groupevents');
+    await groupEvents.handleMetadataEvent(conn, updates);
+  } catch (error) {
+    logger.error(`Group metadata update error: ${error.message}`);
   }
 }
 
 module.exports = {
   handleMessages,
   handleGroupParticipantUpdate,
+  handleGroupMetadataUpdate,
   handleAutoChatBot
 };
