@@ -28,6 +28,8 @@ const settings = {
   channelReactionsCount: 50,
 
   welcomeImages: [
+    "https://files.catbox.moe/p8xi4o.jpeg",
+    "https://files.catbox.moe/p8xi4o.jpeg",
     "https://files.catbox.moe/p8xi4o.jpeg"
   ],
 
