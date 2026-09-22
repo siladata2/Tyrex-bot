@@ -25,7 +25,7 @@ module.exports = {
     // Mask for privacy in logs/status
     const maskedPaired = owner.maskNumber(pairedNumber);
 
-    const text = `NEXORA MD OWNER
+    const text = `TYREX MD OWNER
 
 Name: ${info.name || 'Bot Owner'}
 Role: ${info.role || 'Developer and Owner'}
