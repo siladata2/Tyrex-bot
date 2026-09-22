@@ -4,7 +4,7 @@
   "keywords": ["whatsapp", "bot", "baileys", "tyrex", "multi-device", "js"],
   "repository": "https://github.com/Sila-Md",
   "success_url": "/",
-  "stack": "heroku-22",
+  "stack": "heroku-26",
   "env": {
     "SESSION_ID": {
       "description": "Optional session ID folder contents.",
@@ -16,11 +16,5 @@
       "required": false,
       "value": "255610744352"
     }
-  },
-  "addons": [],
-  "buildpacks": [
-    { "url": "heroku/nodejs" },
-    { "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-static.git" },
-    { "url": "https://github.com/clhuang/heroku-buildpack-webp.git" }
-  ]
+  }
 }
