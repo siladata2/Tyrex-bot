@@ -102,7 +102,7 @@ if (!settings.footer) {
 }
 if (!settings.welcomeImages || !Array.isArray(settings.welcomeImages) || settings.welcomeImages.length === 0) {
   settings.welcomeImages = [
-    'https://files.catbox.moe/p8xi4o.jpeg'
+    'https://i.postimg.cc/NFtJHrzs/tyrex.png'
   ];
 }
 if (!settings.channelId) {
