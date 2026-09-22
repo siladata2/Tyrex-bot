@@ -28,26 +28,24 @@ const settings = {
   channelReactionsCount: 50,
 
   welcomeImages: [
-    "https://i.postimg.cc/NFtJHrzs/tyrex.png",
-    "https://i.postimg.cc/NFtJHrzs/tyrex.png",
     "https://i.postimg.cc/NFtJHrzs/tyrex.png"
   ],
 
   menuThemes: {
     1:  { name: "Classic Box",     image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
     2:  { name: "Double Line",     image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
-    3:  { name: "Minimal",         image: "https://files.catbox.moe/p8xi4o.jpeg" },
-    4:  { name: "Bracketed",       image: "https://files.catbox.moe/p8xi4o.jpeg" },
-    5:  { name: "Starred",         image: "https://files.catbox.moe/p8xi4o.jpeg" },
-    6:  { name: "Arrow",           image: "https://files.catbox.moe/p8xi4o.jpeg" },
-    7:  { name: "Dotted",          image: "https://files.catbox.moe/p8xi4o.jpeg" },
-    8:  { name: "Double Bracket",  image: "https://files.catbox.moe/p8xi4o.jpeg" },
-    9:  { name: "Ornate Crown",    image: "https://files.catbox.moe/p8xi4o.jpeg" },
+    3:  { name: "Minimal",         image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
+    4:  { name: "Bracketed",       image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
+    5:  { name: "Starred",         image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
+    6:  { name: "Arrow",           image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
+    7:  { name: "Dotted",          image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
+    8:  { name: "Double Bracket",  image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
+    9:  { name: "Ornate Crown",    image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
     10: { name: "Gradient Frame",  image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" }
   },
 
   ownerInfo: {
-    name: "TYREX_KSH TECH",
+    name: "TYREX_KSH-TECH",
     role: "Developer and Owner",
     location: "Tanzania",
     currentLoc: "Tanzania",
@@ -56,12 +54,12 @@ const settings = {
     contact: "+255610744352",
     report: "+255610744352",
     support: "+255610744352",
-    github: "https://github.com/Sila-Md",
+    github: "https://github.com/Tyrex-ksh-tech",
     channel: "https://whatsapp.com/channel/0029VbDAQiXHbFV0iSwCtz2o",
     email: "tyrexksh@example.com"
   },
 
-  footer: "> © 𝐏𝐎𝐖𝐄𝐑𝐄𝐃 𝐁𝐘 𝐓𝐘𝐑𝐄𝐗-𝐊𝐒𝐇-𝐓𝐄𝐂𝐇",
+  footer: "> © 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐁𝐲 𝐓𝐲𝐫𝐞𝐱-𝐊𝐬𝐡-𝐓𝐞𝐜𝐡",
   reactionSuccess: "✅",
   reactionError: "❌",
 
