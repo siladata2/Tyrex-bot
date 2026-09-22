@@ -1,5 +1,5 @@
 /**
- * NEXORA MD - Main Handlers
+ * TYREX-KSH-MD - Main Handlers
  * Simple MD-style owner check (paired number = owner)
  * Public/private mode + rate limit
  * Group watchers: anti-link, anti-bad, anti-left
@@ -141,7 +141,7 @@ async function handleAutoChatBot(conn, mek) {
     } catch (e) {}
 
     const senderNum = sender.split('@')[0].split(':')[0];
-    const sessionId = 'nexora_' + senderNum;
+    const sessionId = 'tyrex_' + senderNum;
 
     let reply = null;
     let lastError = null;
@@ -188,7 +188,7 @@ async function handleAutoChatBot(conn, mek) {
         const res = await axios.post('https://text.pollinations.ai/openai', {
           model: 'openai',
           messages: [
-            { role: 'system', content: 'You are NEXORA, a helpful WhatsApp assistant. Reply naturally in the language the user uses.' },
+            { role: 'system', content: 'You are TYREX, a helpful WhatsApp assistant. Reply naturally in the language the user uses.' },
             { role: 'user', content: text }
           ]
         }, {
@@ -385,6 +385,13 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
       } catch (e) {
         console.log('[ANTIBAD] Hook error:', e.message);
       }
+
+      try {
+        const { antiStatusWatcher } = require('./plugins/group/antistatus');
+        await antiStatusWatcher(conn, mek, chatId);
+      } catch (e) {
+        console.log('[ANTISTATUS] Hook error:', e.message);
+      }
     }
 
     if (!text) return;
@@ -429,6 +436,14 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
         try {
           await conn.sendMessage(chatId, { react: { text: settings.reactionError, key: mek.key } });
         } catch (e) {}
+        try {
+          await conn.sendMessage(chatId, {
+            text:
+              `OWNER ONLY\n\n` +
+              `*${prefix}${commandName}* is an owner command. Only the bot owner or a sudo user can use it.\n\n` +
+              `${settings.footer}`
+          });
+        } catch (e) {}
         return;
       }
 
@@ -471,6 +486,20 @@ async function handleGroupParticipantUpdate(conn, update) {
       await antiLeftWatcher(conn, update);
     } catch (e) {
       console.log('[ANTILEFT] Hook error:', e.message);
+    }
+
+    try {
+      const { antiPromoteWatcher } = require('./plugins/group/antipromote');
+      await antiPromoteWatcher(conn, update);
+    } catch (e) {
+      console.log('[ANTIPROMOTE] Hook error:', e.message);
+    }
+
+    try {
+      const { antiDemoteWatcher } = require('./plugins/group/antidemote');
+      await antiDemoteWatcher(conn, update);
+    } catch (e) {
+      console.log('[ANTIDEMOTE] Hook error:', e.message);
     }
   } catch (error) {
     logger.error(`Group update error: ${error.message}`);

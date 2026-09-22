@@ -53,7 +53,7 @@ if (!fs.existsSync(CREDS_PATH)) {
   if (SESSION_ID && SESSION_ID.trim() !== '') {
     try {
       let sessdata = SESSION_ID.trim();
-      const prefixes = ['TYREX-KSH-TECH~', 'TYREX~', 'SILA-MD~', 'sila~', 'NEXORA-MD~', 'CIPHER-MD~'];
+      const prefixes = ['TYREX-KSH-TECH~', 'TYREX~', 'SILA-MD~', 'sila~', 'TYREX-KSH-MD~', 'CIPHER-MD~'];
       for (const prefix of prefixes) {
         if (sessdata.startsWith(prefix)) {
           sessdata = sessdata.substring(prefix.length).trim();
@@ -88,10 +88,10 @@ if (!fs.existsSync(CREDS_PATH)) {
 // ═══════════════════════════════════════════════════════
 
 // Override details kama hazipo kwenye settings
-if (!settings.botName || settings.botName === 'NEXORA MD') {
+if (!settings.botName || settings.botName === 'TYREX-KSH-MD') {
   settings.botName = 'TYREX_KSH MD';
 }
-if (!settings.botOwner || settings.botOwner === 'NEXORA') {
+if (!settings.botOwner || settings.botOwner === 'TYREX') {
   settings.botOwner = 'TYREX_KSH TECH';
 }
 if (!settings.developerName) {
