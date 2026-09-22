@@ -1,5 +1,5 @@
 /**
- * NEXORA MD - Leave Group
+ * TYREX-KSH-MD - Leave Group
  * Usage:
  *   .leave           → leave current group
  *   .leave <groupid> → owner only, leave specific group

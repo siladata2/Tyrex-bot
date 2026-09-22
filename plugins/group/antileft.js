@@ -1,5 +1,5 @@
 /**
- * NEXORA MD - Anti-Left Protection
+ * TYREX-KSH-MD - Anti-Left Protection
  * Re-adds any member who tries to leave the group
  * Tries both JID and LID formats on re-add
  */
