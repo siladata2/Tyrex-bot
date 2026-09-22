@@ -77,7 +77,7 @@ module.exports = {
             }, { quoted: mek });
 
         } catch (error) {
-            console.error('Imagine error:', error.mek);
+            console.error('Imagine error:', error.message);
             await conn.sendMessage(
                 chatId,
                 { text: '❌ Failed to generate image. Please try again later.' },
@@ -94,7 +94,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading imagen-dalle.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading imagen-dalle.js:', e.message); }
 
 /* ===== imagen-flux.js ===== */
 try {
@@ -168,7 +168,7 @@ module.exports = {
             }, { quoted: mek });
 
         } catch (error) {
-            console.error('Imagine error:', error.mek);
+            console.error('Imagine error:', error.message);
             await conn.sendMessage(
                 chatId,
                 { text: '❌ Failed to generate image. Please try again later.' },
@@ -185,7 +185,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading imagen-flux.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading imagen-flux.js:', e.message); }
 
 /* ===== imagine-diffusion.js ===== */
 try {
@@ -259,7 +259,7 @@ module.exports = {
             }, { quoted: mek });
 
         } catch (error) {
-            console.error('Imagine error:', error.mek);
+            console.error('Imagine error:', error.message);
             await conn.sendMessage(
                 chatId,
                 { text: '❌ Failed to generate image. Please try again later.' },
@@ -276,7 +276,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading imagine-diffusion.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading imagine-diffusion.js:', e.message); }
 
 /* ===== imagine.js ===== */
 try {
@@ -381,12 +381,12 @@ module.exports = {
                     }
                 } catch (e) {
                     lastError = e;
-                    console.log(`[IMAGINE] API ${api.url} failed: ${e.mek}`);
+                    console.log(`[IMAGINE] API ${api.url} failed: ${e.message}`);
                 }
             }
 
             if (!imageBuffer) {
-                throw new Error(lastError?.mek || 'All image APIs failed');
+                throw new Error(lastError?.message || 'All image APIs failed');
             }
 
             const type = await fromBuffer(imageBuffer);
@@ -401,9 +401,9 @@ module.exports = {
 
             await conn.sendMessage(chatId, { delete: statusMsg.key });
         } catch (error) {
-            console.error('[IMAGINE] Error:', error.mek);
+            console.error('[IMAGINE] Error:', error.message);
             await conn.sendMessage(chatId, {
-                text: `❌ Failed to generate image.\nReason: ${error.mek}\n\nTry a different prompt or try again later.`
+                text: `❌ Failed to generate image.\nReason: ${error.message}\n\nTry a different prompt or try again later.`
             }, { quoted: mek });
         }
     }
@@ -416,7 +416,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading imagine.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading imagine.js:', e.message); }
 
 /* ===== sora.js ===== */
 try {
@@ -530,12 +530,12 @@ module.exports = {
                     }
                 } catch (e) {
                     lastError = e;
-                    console.log(`[SORA] API ${api.url} failed: ${e.mek}`);
+                    console.log(`[SORA] API ${api.url} failed: ${e.message}`);
                 }
             }
 
             if (!videoBuffer) {
-                throw new Error(lastError?.mek || 'All video APIs failed');
+                throw new Error(lastError?.message || 'All video APIs failed');
             }
 
             // Check video type and convert if needed
@@ -566,9 +566,9 @@ module.exports = {
             await conn.sendMessage(chatId, { delete: statusMsg.key });
 
         } catch (error) {
-            console.error('[SORA] Error:', error.mek);
+            console.error('[SORA] Error:', error.message);
             await conn.sendMessage(chatId, {
-                text: `❌ Failed to generate video.\nReason: ${error.mek}\n\nTry a different prompt or try again later.`,
+                text: `❌ Failed to generate video.\nReason: ${error.message}\n\nTry a different prompt or try again later.`,
                 ...(channelInfo || {})
             }, { quoted: mek });
         }
@@ -582,7 +582,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading sora.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading sora.js:', e.message); }
 
 /* ===== codingImg.js ===== */
 try {
@@ -624,7 +624,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading codingImg.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading codingImg.js:', e.message); }
 
 /* ===== cyberImg.js ===== */
 try {
@@ -668,7 +668,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading cyberImg.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading cyberImg.js:', e.message); }
 
 /* ===== gameImg.js ===== */
 try {
@@ -710,7 +710,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading gameImg.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading gameImg.js:', e.message); }
 
 /* ===== techImg.js ===== */
 try {
@@ -752,7 +752,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading techImg.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading techImg.js:', e.message); }
 
 /* ===== islamicImg.js ===== */
 try {
@@ -794,7 +794,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading islamicImg.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading islamicImg.js:', e.message); }
 
 /* ===== mountImg.js ===== */
 try {
@@ -836,7 +836,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading mountImg.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading mountImg.js:', e.message); }
 
 /* ===== mountainImg.js ===== */
 try {
@@ -880,7 +880,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading mountainImg.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading mountainImg.js:', e.message); }
 
 /* ===== meme.js ===== */
 try {
@@ -942,7 +942,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading meme.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading meme.js:', e.message); }
 
 /* ===== maker.js ===== */
 try {
@@ -980,7 +980,7 @@ module.exports = [
       try {
         await sendImageFromUrl(conn, chatId, mek, url, `✨ *Brat Girl*: ${text}`);
       } catch (err) {
-        conn.sendMessage(chatId, { text: `❌ Failed: ${err.mek}` }, { quoted: mek });
+        conn.sendMessage(chatId, { text: `❌ Failed: ${err.message}` }, { quoted: mek });
       }
     }
   },
@@ -998,7 +998,7 @@ module.exports = [
       try {
         await sendImageFromUrl(conn, chatId, mek, url, `🎞️ Animated ${emoji}`);
       } catch (err) {
-        conn.sendMessage(chatId, { text: `❌ Failed: ${err.mek}` }, { quoted: mek });
+        conn.sendMessage(chatId, { text: `❌ Failed: ${err.message}` }, { quoted: mek });
       }
     }
   },
@@ -1016,7 +1016,7 @@ module.exports = [
         const imgUrl = await getEmojiMix(e1, e2);
         await sendImageFromUrl(conn, chatId, mek, imgUrl, `🔄 ${e1} + ${e2}`);
       } catch (err) {
-        conn.sendMessage(chatId, { text: `❌ Failed: ${err.mek}` }, { quoted: mek });
+        conn.sendMessage(chatId, { text: `❌ Failed: ${err.message}` }, { quoted: mek });
       }
     }
   },
@@ -1043,7 +1043,7 @@ module.exports = [
       try {
         await sendImageFromUrl(conn, chatId, mek, url, `📱 *iPhone Chat*\n${text}`);
       } catch (err) {
-        conn.sendMessage(chatId, { text: `❌ Failed: ${err.mek}` }, { quoted: mek });
+        conn.sendMessage(chatId, { text: `❌ Failed: ${err.message}` }, { quoted: mek });
       }
     }
   },
@@ -1072,7 +1072,7 @@ module.exports = [
       try {
         await sendImageFromUrl(conn, chatId, mek, url, `📜 *Quote*: ${text}`);
       } catch (err) {
-        conn.sendMessage(chatId, { text: `❌ Failed: ${err.mek}` }, { quoted: mek });
+        conn.sendMessage(chatId, { text: `❌ Failed: ${err.message}` }, { quoted: mek });
       }
     }
   },
@@ -1090,7 +1090,7 @@ module.exports = [
       try {
         await sendImageFromUrl(conn, chatId, mek, url, `🧩 *Meme*: ${top} / ${bottom}`);
       } catch (err) {
-        conn.sendMessage(chatId, { text: `❌ Failed: ${err.mek}` }, { quoted: mek });
+        conn.sendMessage(chatId, { text: `❌ Failed: ${err.message}` }, { quoted: mek });
       }
     }
   }
@@ -1103,7 +1103,7 @@ module.exports = [
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading maker.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading maker.js:', e.message); }
 
 /* ===== wasted.js ===== */
 try {
@@ -1168,7 +1168,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading wasted.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading wasted.js:', e.message); }
 
 /* ===== hack.js ===== */
 try {
@@ -1239,7 +1239,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading hack.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading hack.js:', e.message); }
 
 /* ===== couples-dp.js ===== */
 try {
@@ -1297,7 +1297,7 @@ module.exports = {
                     break;
                 }
             } catch (e) {
-                console.warn(`[COUPLEPP] API failed (${apiUrl}):`, e.mek);
+                console.warn(`[COUPLEPP] API failed (${apiUrl}):`, e.message);
             }
         }
 
@@ -1326,10 +1326,10 @@ module.exports = {
             await conn.sendMessage(chatId, { react: { text: CPP_CONFIG.successEmoji, key: mek.key } });
 
         } catch (e) {
-            console.error('[COUPLEPP ERROR]', e.mek);
+            console.error('[COUPLEPP ERROR]', e.message);
             await conn.sendMessage(chatId, { react: { text: CPP_CONFIG.errorEmoji, key: mek.key } });
             await conn.sendMessage(chatId,
-                { text: `❌ *Error fetching couple DP:* \`${e.mek}\`` },
+                { text: `❌ *Error fetching couple DP:* \`${e.message}\`` },
                 { quoted: mek }
             );
         }
@@ -1343,7 +1343,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading couples-dp.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading couples-dp.js:', e.message); }
 
 /* ===== pies.js ===== */
 try {
@@ -1406,7 +1406,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading pies.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading pies.js:', e.message); }
 
 /* ===== quozio.js ===== */
 try {
@@ -1481,7 +1481,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading quozio.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading quozio.js:', e.message); }
 
 /* ===== textmaker.js ===== */
 try {
@@ -1580,7 +1580,7 @@ module.exports = {
             console.error('Error generating styled text:', error);
             await conn.sendMessage(
                 chatId,
-                { text: `❌ *Generation Failed*\nReason: ${error.mek}` },
+                { text: `❌ *Generation Failed*\nReason: ${error.message}` },
                 { quoted: mek }
             );
         }
@@ -1594,7 +1594,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading textmaker.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading textmaker.js:', e.message); }
 
 /* ===== styletext.js ===== */
 try {
@@ -1687,7 +1687,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading styletext.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading styletext.js:', e.message); }
 
 /* ===== tinytext.js ===== */
 try {
@@ -1775,7 +1775,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading tinytext.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading tinytext.js:', e.message); }
 
 /* ===== quote.js ===== */
 try {
@@ -1813,7 +1813,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading quote.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading quote.js:', e.message); }
 
 /* ===== quote2.js ===== */
 try {
@@ -1859,7 +1859,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading quote2.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading quote2.js:', e.message); }
 
 /* ===== alamy.js ===== */
 try {
@@ -1932,12 +1932,12 @@ module.exports = {
             await conn.sendMessage(chatId, { react: { text: '✅', key: mek.key } });
 
         } catch (err) {
-            console.error('[ALAMY ERROR]', err.mek);
+            console.error('[ALAMY ERROR]', err.message);
             await conn.sendMessage(chatId, { react: { text: '❌', key: mek.key } });
 
             const errText = err.code === 'ECONNABORTED' || err.code === 'ETIMEDOUT'
                 ? '❌ *Request timed out.* The API may be slow or temporarily unavailable. Try again later.'
-                : `❌ *Failed to download media from Alamy URL.*\n_Error:_ \`${err.mek}\``;
+                : `❌ *Failed to download media from Alamy URL.*\n_Error:_ \`${err.message}\``;
 
             await conn.sendMessage(chatId, { text: errText }, { quoted: mek });
         }
@@ -1951,7 +1951,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading alamy.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading alamy.js:', e.message); }
 
 /* ===== istock.js ===== */
 try {
@@ -2010,7 +2010,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading istock.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading istock.js:', e.message); }
 
 /* ===== getty.js ===== */
 try {
@@ -2070,7 +2070,7 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading getty.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading getty.js:', e.message); }
 
 /* ===== gimage.js ===== */
 try {
@@ -2140,7 +2140,7 @@ module.exports = {
           allResults = parsed;
           break;
         }
-      } catch (err) { console.log(`${api.name} failed:`, err.mek); }
+      } catch (err) { console.log(`${api.name} failed:`, err.message); }
     }
 
     if (!allResults || !allResults.length) {
@@ -2171,7 +2171,7 @@ module.exports = {
         await conn.sendMessage(chatId, { image: buffer, caption }, { quoted: mek });
         if (i < toDownload - 1) await new Promise(r => setTimeout(r, 800));
       } catch (err) {
-        console.error(`Failed image ${i+1}:`, err.mek);
+        console.error(`Failed image ${i+1}:`, err.message);
       }
     }
   }
@@ -2184,6 +2184,6 @@ module.exports = {
     else if (_m.name && typeof _m.execute === 'function') { _bundle.push(_m); }
     else { for (const k of Object.keys(_m)) { const v = _m[k]; if (Array.isArray(v)) _bundle.push(...v.filter(p => p && p.name && typeof p.execute === 'function')); } }
   }
-} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading gimage.js:', e.mek); }
+} catch(e) { console.warn('[BUNDLE:cat-02-image-gen] Error loading gimage.js:', e.message); }
 
 module.exports = _bundle;
