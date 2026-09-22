@@ -4,7 +4,7 @@
   "keywords": ["whatsapp", "bot", "baileys", "tyrex", "multi-device", "js"],
   "repository": "https://github.com/Sila-Md",
   "success_url": "/",
-  "stack": "container",
+  "stack": "heroku-22",
   "env": {
     "SESSION_ID": {
       "description": "Optional session ID folder contents.",
@@ -13,7 +13,7 @@
     },
     "OWNER_NUMBER": {
       "description": "Your main WhatsApp number with country code. No + or - spaces.",
-      "required": true,
+      "required": false,
       "value": "255610744352"
     }
   },
