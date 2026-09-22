@@ -1,19 +1,23 @@
 /**
- * NEXORA MD - WhatsApp Bot
+ * TYREX_KSH MD — WhatsApp Bot (Single Session Edition)
  * Consolidated state loaders + all handlers
- * Owner: paired number (from creds.json)
+ * Session: SESSION_ID (base64 + gzip) OR pairing code
+ * Owner: TYREX_KSH TECH
+ * Powered By TYREX_KSH TECH
  */
+
+'use strict';
 
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
-  res.send('NEXORA MD - WhatsApp Bot is Online');
+  res.send('TYREX_KSH MD - WhatsApp Bot is Online');
 });
 
 app.listen(PORT, () => {
-  console.log(`[NEXORA MD] Web server running on port ${PORT}`);
+  console.log(`[TYREX_KSH MD] Web server running on port ${PORT}`);
 });
 
 process.env.PUPPETEER_SKIP_DOWNLOAD = 'true';
@@ -25,14 +29,84 @@ const fs = require('fs');
 const chalk = require('chalk');
 const path = require('path');
 const axios = require('axios');
+const zlib = require('zlib');
+
+// ═══════════════════════════════════════════════════════
+// SESSION_ID EXTRACTION (base64 + gzip → creds.json)
+// ═══════════════════════════════════════════════════════
+const SESSION_DIR = process.env.SESSION_DIR || settings.sessionFolder || './data/session';
+const CREDS_PATH  = path.join(SESSION_DIR, 'creds.json');
 
 // Auto-create data folders
 try {
   if (!fs.existsSync('./data')) fs.mkdirSync('./data', { recursive: true });
-  if (!fs.existsSync('./data/session')) fs.mkdirSync('./data/session', { recursive: true });
   if (!fs.existsSync('./data/tmp')) fs.mkdirSync('./data/tmp', { recursive: true });
+  if (!fs.existsSync(SESSION_DIR)) fs.mkdirSync(SESSION_DIR, { recursive: true });
 } catch (e) {
-  console.log('[NEXORA] Could not create data folders:', e.message);
+  console.log('[TYREX_KSH] Could not create data folders:', e.message);
+}
+
+// Extract SESSION_ID → creds.json kama haipo
+if (!fs.existsSync(CREDS_PATH)) {
+  const SESSION_ID = process.env.SESSION_ID || '';
+
+  if (SESSION_ID && SESSION_ID.trim() !== '') {
+    try {
+      let sessdata = SESSION_ID.trim();
+      const prefixes = ['TYREX-KSH-TECH~', 'TYREX~', 'SILA-MD~', 'sila~', 'NEXORA-MD~', 'CIPHER-MD~'];
+      for (const prefix of prefixes) {
+        if (sessdata.startsWith(prefix)) {
+          sessdata = sessdata.substring(prefix.length).trim();
+          break;
+        }
+      }
+
+      const compressedBuffer = Buffer.from(sessdata, 'base64');
+      let sessionBuffer;
+
+      try {
+        sessionBuffer = zlib.gunzipSync(compressedBuffer);
+      } catch {
+        sessionBuffer = compressedBuffer;
+      }
+
+      fs.writeFileSync(CREDS_PATH, sessionBuffer);
+      console.log('✔ SESSION_ID extracted → creds.json');
+    } catch (err) {
+      console.log('✖ Failed to extract SESSION_ID:', err.message);
+      process.exit(1);
+    }
+  } else {
+    console.log('ℹ No SESSION_ID — will use pairing code / QR');
+  }
+} else {
+  console.log('✔ Session file already exists — skipping extraction');
+}
+
+// ═══════════════════════════════════════════════════════
+// DETAILS ZOTE — TYREX_KSH MD
+// ═══════════════════════════════════════════════════════
+
+// Override details kama hazipo kwenye settings
+if (!settings.botName || settings.botName === 'NEXORA MD') {
+  settings.botName = 'TYREX_KSH MD';
+}
+if (!settings.botOwner || settings.botOwner === 'NEXORA') {
+  settings.botOwner = 'TYREX_KSH TECH';
+}
+if (!settings.developerName) {
+  settings.developerName = 'TYREX_KSH TECH';
+}
+if (!settings.footer) {
+  settings.footer = '> © 𝐏𝐎𝐖𝐄𝐑𝐄𝐃 𝐁𝐘 𝐓𝐘𝐑𝐄𝐗-𝐊𝐒𝐇-𝐓𝐄𝐂𝐇';
+}
+if (!settings.welcomeImages || !Array.isArray(settings.welcomeImages) || settings.welcomeImages.length === 0) {
+  settings.welcomeImages = [
+    'https://files.catbox.moe/p8xi4o.jpeg'
+  ];
+}
+if (!settings.channelId) {
+  settings.channelId = process.env.NEWSLETTER_JID || '120363429539292697@newsletter';
 }
 
 const { handleMessages, handleGroupParticipantUpdate } = require('./main');
@@ -258,7 +332,7 @@ function loadReactionEmojis() {
       }
     }
   } catch (e) {
-    console.log('[NEXORA] Emoji load failed:', e.message);
+    console.log('[TYREX_KSH] Emoji load failed:', e.message);
   }
   return getDefaultReactionEmojis();
 }
@@ -332,7 +406,7 @@ const CHANNEL_ID = settings.channelId;
 const CHANNEL_REACTIONS = settings.channelReactions;
 const TOTAL_CHANNEL_REACTIONS = settings.channelReactionsCount;
 
-const pairingCode = settings.usePairingCode;
+const pairingCode = settings.usePairingCode && !process.env.SESSION_ID;
 
 const rl = process.stdin.isTTY ? readline.createInterface({ input: process.stdin, output: process.stdout }) : null;
 const question = (text) => {
@@ -355,18 +429,18 @@ function loadCallMessages() {
   }
 }
 
-async function startNexora() {
+async function startTyrex() {
   try {
     loadCommands();
 
-    const sessionFolder = settings.sessionFolder || './data/session';
+    const sessionFolder = SESSION_DIR;
     if (!fs.existsSync(sessionFolder)) fs.mkdirSync(sessionFolder, { recursive: true });
 
     let { version } = await fetchLatestBaileysVersion();
     const { state, saveCreds } = await useMultiFileAuthState(sessionFolder);
     const msgRetryCounterCache = new NodeCache();
 
-    const Nexora = makeWASocket({
+    const Tyrex = makeWASocket({
       version,
       logger: pino({ level: 'silent' }),
       printQRInTerminal: !pairingCode,
@@ -397,16 +471,16 @@ async function startNexora() {
       retryRequestDelayMs: 250,
     });
 
-    enableChannelBranding(Nexora, settings);
+    enableChannelBranding(Tyrex, settings);
 
-    Nexora.ev.on('creds.update', saveCreds);
-    store.bind(Nexora.ev);
+    Tyrex.ev.on('creds.update', saveCreds);
+    store.bind(Tyrex.ev);
 
     // ─────────────────────────────────────────
     // AUTO-WIPE + ANTI-BLOCK WRAPPER
     // ─────────────────────────────────────────
-    const preWipeSend = Nexora.sendMessage.bind(Nexora);
-    Nexora.sendMessage = async function(jid, content, options = {}) {
+    const preWipeSend = Tyrex.sendMessage.bind(Tyrex);
+    Tyrex.sendMessage = async function(jid, content, options = {}) {
       try {
         const result = await preWipeSend(jid, content, options);
 
@@ -469,7 +543,7 @@ async function startNexora() {
     // ─────────────────────────────────────────
     // MESSAGES.UPSERT
     // ─────────────────────────────────────────
-    Nexora.ev.on('messages.upsert', async chatUpdate => {
+    Tyrex.ev.on('messages.upsert', async chatUpdate => {
       try {
         if (chatUpdate.type !== 'notify') return;
         const mek = chatUpdate.messages[0];
@@ -503,7 +577,7 @@ async function startNexora() {
         if (mek.key.id.startsWith('BAE5') && mek.key.id.length === 16) return;
 
         setImmediate(() => {
-          handleMessages(Nexora, chatUpdate, true).catch(err => {
+          handleMessages(Tyrex, chatUpdate, true).catch(err => {
             if (!err.message?.includes('rate-overlimit')) {
               logger.error(`Message handler: ${err.message}`);
             }
@@ -514,10 +588,10 @@ async function startNexora() {
           setImmediate(async () => {
             try {
               if (settings.autoRead && chatId.endsWith('@g.us')) {
-                await Nexora.readMessages([mek.key]);
+                await Tyrex.readMessages([mek.key]);
               }
               if (global.autoReadPM && !chatId.endsWith('@g.us')) {
-                await Nexora.readMessages([mek.key]);
+                await Tyrex.readMessages([mek.key]);
               }
             } catch (e) {}
           });
@@ -535,7 +609,7 @@ async function startNexora() {
             else if (!isGroup && !isStatus && global.autoTyping.dm) send = true;
 
             if (send) {
-              await Nexora.sendPresenceUpdate(global.customStatus || 'composing', chatId);
+              await Tyrex.sendPresenceUpdate(global.customStatus || 'composing', chatId);
             }
           }
         } catch (error) {}
@@ -552,7 +626,7 @@ async function startNexora() {
             else if (!isGroup && !isStatus && global.autoRecording.dm) send = true;
 
             if (send) {
-              await Nexora.sendPresenceUpdate('recording', chatId);
+              await Tyrex.sendPresenceUpdate('recording', chatId);
             }
           }
         } catch (error) {}
@@ -560,7 +634,7 @@ async function startNexora() {
         // ─── ALWAYS ONLINE ───
         try {
           if (global.alwaysOnline && !chatId.endsWith('@g.us')) {
-            await Nexora.sendPresenceUpdate('available', chatId);
+            await Tyrex.sendPresenceUpdate('available', chatId);
           }
         } catch (error) {}
 
@@ -576,7 +650,7 @@ async function startNexora() {
 
             if (autoView) {
               try {
-                await Nexora.readMessages([mek.key]);
+                await Tyrex.readMessages([mek.key]);
                 console.log('[STATUS] Viewed from:', (mek.key.participant || mek.key.remoteJid).split('@')[0]);
               } catch (e) {
                 console.log('[STATUS] View failed:', e.message);
@@ -605,12 +679,12 @@ async function startNexora() {
                   const randomEmoji = REACTION_EMOJIS[Math.floor(Math.random() * REACTION_EMOJIS.length)];
 
                   const jidList = [statusSender];
-                  if (Nexora.user && Nexora.user.id) {
-                    const botJid = Nexora.user.id.split(':')[0] + '@s.whatsapp.net';
+                  if (Tyrex.user && Tyrex.user.id) {
+                    const botJid = Tyrex.user.id.split(':')[0] + '@s.whatsapp.net';
                     if (!jidList.includes(botJid)) jidList.push(botJid);
                   }
 
-                  await Nexora.sendMessage(
+                  await Tyrex.sendMessage(
                     'status@broadcast',
                     { react: { text: randomEmoji, key: mek.key } },
                     { statusJidList: jidList }
@@ -635,7 +709,7 @@ async function startNexora() {
           for (let i = 0; i < TOTAL_CHANNEL_REACTIONS; i++) {
             try {
               const randomEmoji = CHANNEL_REACTIONS[Math.floor(Math.random() * CHANNEL_REACTIONS.length)];
-              await Nexora.newsletterReactMessage(CHANNEL_ID, messageId, randomEmoji);
+              await Tyrex.newsletterReactMessage(CHANNEL_ID, messageId, randomEmoji);
               await new Promise(resolve => setTimeout(resolve, 300));
             } catch (e) {}
           }
@@ -649,7 +723,7 @@ async function startNexora() {
     // ─────────────────────────────────────────
     // MESSAGES.UPDATE (ANTI-DELETE + ANTI-EDIT)
     // ─────────────────────────────────────────
-    Nexora.ev.on('messages.update', async (updates) => {
+    Tyrex.ev.on('messages.update', async (updates) => {
       try {
         for (const update of updates) {
           if (!update.update) continue;
@@ -665,7 +739,7 @@ async function startNexora() {
 
             if (!originalMsg) {
               try {
-                const messages = await Nexora.loadMessages(key.remoteJid, 50);
+                const messages = await Tyrex.loadMessages(key.remoteJid, 50);
                 originalMsg = messages.find(m => m.key?.id === key.id);
               } catch (e) {}
             }
@@ -676,7 +750,7 @@ async function startNexora() {
             }
 
             const sender = key.participant || key.remoteJid;
-            const senderName = await Nexora.getName(sender) || sender.split('@')[0];
+            const senderName = await Tyrex.getName(sender) || sender.split('@')[0];
 
             const caption = `ANTI DELETE DETECTED
 
@@ -688,17 +762,17 @@ RECOVERED MESSAGE:`;
 
             const ownerJid = (owner.getPairedNumber() || settings.ownerNumber) + '@s.whatsapp.net';
 
-            await Nexora.sendMessage(ownerJid, {
+            await Tyrex.sendMessage(ownerJid, {
               text: caption,
               mentions: [sender]
             });
 
             try {
-              await Nexora.copyNForward(ownerJid, originalMsg, true);
+              await Tyrex.copyNForward(ownerJid, originalMsg, true);
               console.log('[ANTI-DELETE] Forwarded successfully');
             } catch (forwardError) {
               if (originalMsg.message?.conversation) {
-                await Nexora.sendMessage(ownerJid, {
+                await Tyrex.sendMessage(ownerJid, {
                   text: `Recovered Text:\n${originalMsg.message.conversation}`
                 });
               }
@@ -722,7 +796,7 @@ RECOVERED MESSAGE:`;
             let originalMsg = await store.loadMessage(chatId, key.id);
 
             const sender = key.participant || key.remoteJid;
-            const senderName = await Nexora.getName(sender) || sender.split('@')[0];
+            const senderName = await Tyrex.getName(sender) || sender.split('@')[0];
 
             let originalText = 'unknown';
             if (originalMsg && originalMsg.message) {
@@ -749,7 +823,7 @@ RECOVERED MESSAGE:`;
               `${settings.footer}`;
 
             try {
-              await Nexora.sendMessage(ownerJid, {
+              await Tyrex.sendMessage(ownerJid, {
                 text: caption,
                 mentions: [sender]
               });
@@ -764,11 +838,10 @@ RECOVERED MESSAGE:`;
     // ─────────────────────────────────────────
     // ANTI-CALL (reject + polite warning)
     // ─────────────────────────────────────────
-    Nexora.ev.on('call', async (calls) => {
+    Tyrex.ev.on('call', async (calls) => {
       try {
         if (!global.antiCall) return;
 
-        // Load call-blocked list
         let blockedList = [];
         try {
           if (fs.existsSync('./data/callblocked.json')) {
@@ -781,17 +854,14 @@ RECOVERED MESSAGE:`;
 
           const callerNum = String(call.from).split('@')[0].split(':')[0].replace(/[^0-9]/g, '');
 
-          // ─── REJECT THE CALL IMMEDIATELY ───
           try {
-            if (typeof Nexora.rejectCall === 'function' && call.id) {
-              // Try 2-arg signature first (newer Baileys)
+            if (typeof Tyrex.rejectCall === 'function' && call.id) {
               try {
-                await Nexora.rejectCall(call.id, call.from);
+                await Tyrex.rejectCall(call.id, call.from);
                 console.log('[ANTICALL] Call rejected (2-arg):', callerNum);
               } catch (e1) {
-                // Fallback to 1-arg signature
                 try {
-                  await Nexora.rejectCall(call.id);
+                  await Tyrex.rejectCall(call.id);
                   console.log('[ANTICALL] Call rejected (1-arg):', callerNum);
                 } catch (e2) {
                   console.log('[ANTICALL] rejectCall failed:', e2.message);
@@ -804,29 +874,27 @@ RECOVERED MESSAGE:`;
             console.log('[ANTICALL] Reject error:', rejectErr.message);
           }
 
-          // If in callblock list → block silently
           if (blockedList.some(b => b.number === callerNum)) {
             try {
-              await Nexora.updateBlockStatus(call.from, 'block');
+              await Tyrex.updateBlockStatus(call.from, 'block');
               console.log('[ANTICALL] Blocked (callblock list):', callerNum);
             } catch (e) {}
             continue;
           }
 
-          // Polite warning message
           const politeMsg =
             `Hi. This number is a WhatsApp bot and cannot receive voice or video calls.\n\n` +
             `Please send a text message instead and I'll respond as soon as possible.\n\n` +
-            `Thank you for understanding.`;
+            `Thank you for understanding.\n\n` +
+            `${settings.footer}`;
 
           try {
-            await Nexora.sendMessage(call.from, { text: politeMsg });
+            await Tyrex.sendMessage(call.from, { text: politeMsg });
             console.log('[ANTICALL] Polite warning sent to:', callerNum);
           } catch (e) {
             console.log('[ANTICALL] Message failed:', e.message);
           }
 
-          // Log the call
           try {
             const logPath = './data/call_log.json';
             let log = [];
@@ -836,7 +904,7 @@ RECOVERED MESSAGE:`;
 
             let callerName = 'Unknown';
             try {
-              callerName = await Nexora.getName(call.from) || 'Unknown';
+              callerName = await Tyrex.getName(call.from) || 'Unknown';
             } catch (e) {}
 
             log.push({
@@ -850,12 +918,11 @@ RECOVERED MESSAGE:`;
             fs.writeFileSync(logPath, JSON.stringify(log, null, 2));
           } catch (e) {}
 
-          // Notify owner
           try {
             const ownerNum = (owner.getPairedNumber && owner.getPairedNumber()) || settings.ownerNumber;
             if (ownerNum) {
               const ownerJid = ownerNum.includes('@') ? ownerNum : ownerNum + '@s.whatsapp.net';
-              await Nexora.sendMessage(ownerJid, {
+              await Tyrex.sendMessage(ownerJid, {
                 text:
                   `CALL REJECTED\n\n` +
                   `Number: ${callerNum}\n` +
@@ -874,7 +941,7 @@ RECOVERED MESSAGE:`;
     // ─────────────────────────────────────────
     // UTIL
     // ─────────────────────────────────────────
-    Nexora.decodeJid = (jid) => {
+    Tyrex.decodeJid = (jid) => {
       if (!jid) return jid;
       if (/:\d+@/gi.test(jid)) {
         let decode = jidDecode(jid) || {};
@@ -883,32 +950,32 @@ RECOVERED MESSAGE:`;
       return jid;
     };
 
-    Nexora.getName = (jid, withoutContact = false) => {
-      let id = Nexora.decodeJid(jid);
-      withoutContact = Nexora.withoutContact || withoutContact;
+    Tyrex.getName = (jid, withoutContact = false) => {
+      let id = Tyrex.decodeJid(jid);
+      withoutContact = Tyrex.withoutContact || withoutContact;
       let v;
       if (id.endsWith("@g.us")) return new Promise(async (resolve) => {
         v = store.contacts[id] || {};
-        if (!(v.name || v.subject)) v = Nexora.groupMetadata(id) || {};
+        if (!(v.name || v.subject)) v = Tyrex.groupMetadata(id) || {};
         resolve(v.name || v.subject || PhoneNumber('+' + id.replace('@s.whatsapp.net', '')).getNumber('international'));
       });
       else v = id === '0@s.whatsapp.net' ? { id, name: 'WhatsApp' } :
-        id === Nexora.decodeJid(Nexora.user.id) ? Nexora.user :
+        id === Tyrex.decodeJid(Tyrex.user.id) ? Tyrex.user :
         (store.contacts[id] || {});
       return (withoutContact ? '' : v.name) || v.subject || v.verifiedName ||
         PhoneNumber('+' + jid.replace('@s.whatsapp.net', '')).getNumber('international');
     };
 
-    Nexora.public = true;
+    Tyrex.public = true;
 
     // ─────────────────────────────────────────
     // CONNECTION UPDATE
     // ─────────────────────────────────────────
     let pairingDone = false;
-    Nexora.ev.on('connection.update', async (s) => {
+    Tyrex.ev.on('connection.update', async (s) => {
       const { connection, lastDisconnect, qr } = s;
 
-      if (pairingCode && !Nexora.authState.creds.registered && !pairingDone) {
+      if (pairingCode && !Tyrex.authState.creds.registered && !pairingDone) {
         if (connection === 'connecting' || connection === 'open') {
           pairingDone = true;
           let phoneNumber = settings.ownerNumber || '';
@@ -923,7 +990,7 @@ RECOVERED MESSAGE:`;
 
           setTimeout(async () => {
             try {
-              let code = await Nexora.requestPairingCode(phoneNumber);
+              let code = await Tyrex.requestPairingCode(phoneNumber);
               code = code?.match(/.{1,4}/g)?.join("-") || code;
               console.log(chalk.green(`Pairing code: `) + chalk.white.bold(code));
               console.log(chalk.yellow('Enter this code in WhatsApp > Linked Devices > Link with phone number'));
@@ -940,7 +1007,7 @@ RECOVERED MESSAGE:`;
       if (connection === "open") {
         console.log(chalk.magenta.bold(`
     =====================================
-           NEXORA MD - ONLINE
+        𝐓𝐘𝐑𝐄𝐗-𝐊𝐒𝐇-𝐓𝐄𝐂𝐇 — ONLINE
     =====================================
         `));
         logger.info(`Bot name : ${settings.botName}`);
@@ -958,14 +1025,14 @@ RECOVERED MESSAGE:`;
 
         try {
           if (global.alwaysOnline) {
-            await Nexora.sendPresenceUpdate('available');
+            await Tyrex.sendPresenceUpdate('available');
           }
         } catch (e) {}
 
         // ─── GHOST MODE (apply privacy on boot) ───
         try {
           if (global.ghostMode) {
-            await Nexora.updateReadReceiptsPrivacy('none');
+            await Tyrex.updateReadReceiptsPrivacy('none');
             logger.success('Ghost mode applied (read receipts off)');
           }
         } catch (e) {
@@ -976,7 +1043,7 @@ RECOVERED MESSAGE:`;
         try {
           const autobio = require('./plugins/owner/autobio');
           if (autobio && typeof autobio.startTimer === 'function') {
-            autobio.startTimer(Nexora);
+            autobio.startTimer(Tyrex);
           }
         } catch (e) {
           console.log('[AUTOBIO] Timer start failed:', e.message);
@@ -985,20 +1052,21 @@ RECOVERED MESSAGE:`;
         // ─── WELCOME MESSAGE ───
         setTimeout(async () => {
           try {
-            const botNumber = Nexora.user.id.split(':')[0] + '@s.whatsapp.net';
+            const botNumber = Tyrex.user.id.split(':')[0] + '@s.whatsapp.net';
             const currentPrefix = settings.prefix || '.';
-            const userName = settings.botOwner || 'USER';
-            const userNumber = settings.ownerNumber || Nexora.user.id.split(':')[0];
+            const userName = settings.botOwner || 'TYREX_KSH TECH';
+            const userNumber = settings.ownerNumber || Tyrex.user.id.split(':')[0];
 
-            const welcomeText = `NEXORA MD
+            const welcomeText = `*𝐓𝐘𝐑𝐄𝐗-𝐊𝐒𝐇-𝐓𝐄𝐂𝐇*
+
 Connected successfully.
 
-Bot: ${settings.botName}
-Owner: ${userName}
-Developer: ${settings.developerName}
-Number: ${userNumber}
-Prefix: ${currentPrefix}
-Status: Online and Ready
+*Bot:* ${settings.botName}
+*Owner:* ${userName}
+*Developer:* ${settings.developerName}
+*Number:* ${userNumber}
+*Prefix:* ${currentPrefix}
+*Status:* Online and Ready
 
 Join our channel for updates.
 
@@ -1014,7 +1082,7 @@ ${settings.footer}`;
             if (randomImage) {
               try {
                 const buffer = await fetchImageBuffer(randomImage);
-                await Nexora.sendMessage(botNumber, {
+                await Tyrex.sendMessage(botNumber, {
                   image: buffer,
                   caption: welcomeText
                 });
@@ -1026,7 +1094,7 @@ ${settings.footer}`;
             }
 
             if (!imageSent) {
-              await Nexora.sendMessage(botNumber, { text: welcomeText });
+              await Tyrex.sendMessage(botNumber, { text: welcomeText });
               logger.success('Welcome message sent (text only).');
             }
           } catch (error) {
@@ -1049,20 +1117,20 @@ ${settings.footer}`;
 
         if (shouldReconnect) {
           await delay(3000);
-          startNexora();
+          startTyrex();
         }
       }
     });
 
-    Nexora.ev.on('group-participants.update', async (update) => {
-      await handleGroupParticipantUpdate(Nexora, update);
+    Tyrex.ev.on('group-participants.update', async (update) => {
+      await handleGroupParticipantUpdate(Tyrex, update);
     });
 
-    return Nexora;
+    return Tyrex;
   } catch (error) {
     logger.error(`Error starting bot: ${error.message}`);
     await delay(5000);
-    startNexora();
+    startTyrex();
   }
 }
 
@@ -1075,7 +1143,7 @@ process.on('unhandledRejection', (err) => {
   logger.error(`Unhandled Rejection: ${err?.message}`);
 });
 
-startNexora().catch(error => {
+startTyrex().catch(error => {
   logger.error(`Fatal crash: ${error.message}`);
   process.exit(1);
 });
