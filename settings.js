@@ -3,65 +3,63 @@ const settings = {
   // ═══════════════════════════════════════════════
   // EDIT THESE 2 LINES ONLY
   // ═══════════════════════════════════════════════
-  ownerNumber: "254755660053",       // ← Your number here
-  botOwner: "Rodgers",                // ← Your name here
+  ownerNumber: "255610744352",        // ← Your number here
+  botOwner: "TYREX_KSH TECH",         // ← Your name here
 
 
   // ═══════════════════════════════════════════════
   // EVERYTHING BELOW WORKS OUT OF THE BOX
   // ═══════════════════════════════════════════════
-  botName: "𝐍𝐄𝐗𝐎𝐑𝐀 𝐌𝐃",
+  botName: "𝐓𝐘𝐑𝐄𝐗-𝐊𝐒𝐇-𝐌𝐃",
   prefix: ".",
   mode: "public",
 
-  developerNumber: "254755660053",
-  developerName: "RODGERS",
+  developerNumber: "255610744352",
+  developerName: "TYREX_KSH-TECH",
   sudoUsers: [
-    "254755660053"
+    "255610744352"
   ],
 
-  channelId: "120363411498601038@newsletter",
-  channelLink: "https://whatsapp.com/channel/0029VbCwZHACXC3PNHgtMT31",
-  channelName: "NEXORA MD",
+  channelId: "120363429539292697@newsletter",
+  channelLink: "https://whatsapp.com/channel/0029VbDAQiXHbFV0iSwCtz2o",
+  channelName: "TYREX_KSH-MD",
 
   channelReactions: ['🥰', '😘', '🤯', '🙄'],
   channelReactionsCount: 50,
 
   welcomeImages: [
-    "https://imagetourl.cloud/8lefs2tlap9u.png",
-    "https://imagetourl.cloud/sk3gkrgw3ru6.png",
-    "https://imagetourl.cloud/uiwsbgle71il.png"
+    "https://files.catbox.moe/p8xi4o.jpeg"
   ],
 
   menuThemes: {
-    1:  { name: "Classic Box",     image: "https://imagetourl.cloud/8lefs2tlap9u.png" },
-    2:  { name: "Double Line",     image: "https://imagetourl.cloud/sk3gkrgw3ru6.png" },
-    3:  { name: "Minimal",         image: "https://imagetourl.cloud/uiwsbgle71il.png" },
-    4:  { name: "Bracketed",       image: "https://imagetourl.cloud/ex40swwr598h.jpg" },
-    5:  { name: "Starred",         image: "https://imagetourl.cloud/bu0m060dmlvk.jpg" },
-    6:  { name: "Arrow",           image: "https://imagetourl.cloud/mxz4axnknxo.jpg" },
-    7:  { name: "Dotted",          image: "https://imagetourl.cloud/jg073ljbkas5.jpg" },
-    8:  { name: "Double Bracket",  image: "https://imagetourl.cloud/kbwvnoapvcq6.png" },
-    9:  { name: "Ornate Crown",    image: "https://imagetourl.cloud/pqk9yzx7p1u9.png" },
-    10: { name: "Gradient Frame",  image: "https://imagetourl.cloud/fwvm94dv4ysa.png" }
+    1:  { name: "Classic Box",     image: "https://files.catbox.moe/p8xi4o.jpeg" },
+    2:  { name: "Double Line",     image: "https://files.catbox.moe/p8xi4o.jpeg" },
+    3:  { name: "Minimal",         image: "https://files.catbox.moe/p8xi4o.jpeg" },
+    4:  { name: "Bracketed",       image: "https://files.catbox.moe/p8xi4o.jpeg" },
+    5:  { name: "Starred",         image: "https://files.catbox.moe/p8xi4o.jpeg" },
+    6:  { name: "Arrow",           image: "https://files.catbox.moe/p8xi4o.jpeg" },
+    7:  { name: "Dotted",          image: "https://files.catbox.moe/p8xi4o.jpeg" },
+    8:  { name: "Double Bracket",  image: "https://files.catbox.moe/p8xi4o.jpeg" },
+    9:  { name: "Ornate Crown",    image: "https://files.catbox.moe/p8xi4o.jpeg" },
+    10: { name: "Gradient Frame",  image: "https://files.catbox.moe/p8xi4o.jpeg" }
   },
 
   ownerInfo: {
-    name: "Rodgers Onyango",
+    name: "TYREX_KSH TECH",
     role: "Developer and Owner",
-    location: "Kisumu, Kenya",
-    currentLoc: "Nakuru, Kenya",
+    location: "Tanzania",
+    currentLoc: "Tanzania",
     girlfriend: "Currently Single",
     status: "Taken by the code",
-    contact: "+254755660053",
-    report: "+254716388654",
-    support: "+254755660053",
-    github: "https://github.com/queenbellabots-cloud/NEXORA-MD-",
-    channel: "https://whatsapp.com/channel/0029VbCwZHACXC3PNHgtMT31",
-    email: "rogersonyango87@gmail.com"
+    contact: "+255610744352",
+    report: "+255610744352",
+    support: "+255610744352",
+    github: "https://github.com/Sila-Md",
+    channel: "https://whatsapp.com/channel/0029VbDAQiXHbFV0iSwCtz2o",
+    email: "tyrexksh@example.com"
   },
 
-  footer: "> © Powered by Rodgers",
+  footer: "> © 𝐏𝐎𝐖𝐄𝐑𝐄𝐃 𝐁𝐘 𝐓𝐘𝐑𝐄𝐗-𝐊𝐒𝐇-𝐓𝐄𝐂𝐇",
   reactionSuccess: "✅",
   reactionError: "❌",
 
@@ -83,8 +81,8 @@ const settings = {
   autoStatusReact: true,
   autoChatBot: false,
 
-  usePairingCode: true,
-  timeZone: "Africa/Nairobi",
+  usePairingCode: false,             // ← SESSION_ID inatumika sasa
+  timeZone: "Africa/Dar_es_Salaam",
 
   WARN_COUNT: 3,
   storeWriteInterval: 10000,
