@@ -1,26 +1,20 @@
 {
-  "name": "NEXORA-MD",
-  "description": "NEXORA MD - Advanced WhatsApp Bot",
-  "keywords": ["whatsapp", "bot", "baileys", "nexora", "multi-device", "js"],
-  "repository": "https://github.com/YOUR_USERNAME/NEXORA-MD",
+  "name": "TYREX-KSH-MD",
+  "description": "TYREX_KSH MD - Advanced WhatsApp Bot",
+  "keywords": ["whatsapp", "bot", "baileys", "tyrex", "multi-device", "js"],
+  "repository": "https://github.com/Sila-Md",
   "success_url": "/",
   "stack": "container",
   "env": {
     "SESSION_ID": {
       "description": "Optional session ID folder contents.",
-      "required": false,
+      "required": true,
       "value": ""
     },
     "OWNER_NUMBER": {
       "description": "Your main WhatsApp number with country code. No + or - spaces.",
-      "required": false,
-      "value": "254755660053"
-    }
-  },
-  "formation": {
-    "worker": {
-      "quantity": 1,
-      "size": "eco"
+      "required": true,
+      "value": "255610744352"
     }
   },
   "addons": [],
