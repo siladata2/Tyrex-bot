@@ -138,7 +138,7 @@ module.exports = [
   // ── 3. BIO ───────────────────────────────────
   {
     name: 'bio',
-    aliases: ['about', 'getbio'],
+    aliases: ['about', 'getbio2'],
     category: 'general',
     description: "Get a user's WhatsApp About/status text",
     usage: '.bio [@user | number | reply]',
