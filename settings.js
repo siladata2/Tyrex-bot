@@ -34,8 +34,8 @@ const settings = {
   ],
 
   menuThemes: {
-    1:  { name: "Classic Box",     image: "https://files.catbox.moe/p8xi4o.jpeg" },
-    2:  { name: "Double Line",     image: "https://files.catbox.moe/p8xi4o.jpeg" },
+    1:  { name: "Classic Box",     image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
+    2:  { name: "Double Line",     image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
     3:  { name: "Minimal",         image: "https://files.catbox.moe/p8xi4o.jpeg" },
     4:  { name: "Bracketed",       image: "https://files.catbox.moe/p8xi4o.jpeg" },
     5:  { name: "Starred",         image: "https://files.catbox.moe/p8xi4o.jpeg" },
@@ -43,7 +43,7 @@ const settings = {
     7:  { name: "Dotted",          image: "https://files.catbox.moe/p8xi4o.jpeg" },
     8:  { name: "Double Bracket",  image: "https://files.catbox.moe/p8xi4o.jpeg" },
     9:  { name: "Ornate Crown",    image: "https://files.catbox.moe/p8xi4o.jpeg" },
-    10: { name: "Gradient Frame",  image: "https://files.catbox.moe/p8xi4o.jpeg" }
+    10: { name: "Gradient Frame",  image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" }
   },
 
   ownerInfo: {
