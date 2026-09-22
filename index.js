@@ -367,13 +367,23 @@ function loadCommands() {
   for (const filePath of files) {
     try {
       delete require.cache[require.resolve(filePath)];
-      const command = require(filePath);
-      if (command && command.name && typeof command.execute === 'function') {
-        global.commands.set(command.name.toLowerCase(), command);
-        if (Array.isArray(command.aliases)) {
-          command.aliases.forEach(a => global.commands.set(a.toLowerCase(), command));
+      const exported = require(filePath);
+      // A plugin file can export either a single command object
+      // ({ name, execute, ... }) or an array of them (bundle files).
+      const list = Array.isArray(exported) ? exported : [exported];
+      let fileLoaded = 0;
+      for (const command of list) {
+        if (command && command.name && typeof command.execute === 'function') {
+          global.commands.set(command.name.toLowerCase(), command);
+          if (Array.isArray(command.aliases)) {
+            command.aliases.forEach(a => global.commands.set(a.toLowerCase(), command));
+          }
+          loaded++;
+          fileLoaded++;
         }
-        loaded++;
+      }
+      if (fileLoaded === 0) {
+        logger.warn(`No valid commands found in ${path.basename(filePath)}`);
       }
     } catch (error) {
       logger.error(`Failed to load ${path.basename(filePath)}: ${error.message}`);
