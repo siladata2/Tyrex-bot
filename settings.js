@@ -4,25 +4,25 @@ const settings = {
   // EDIT THESE 2 LINES ONLY
   // ═══════════════════════════════════════════════
   ownerNumber: "255610744352",        // ← Your number here
-  botOwner: "*TYREX_KSH-TECH*",         // ← Your name here
+  botOwner: "Ƭყɾҽx-ƙʂԋ-Ƭҽƈԋ",         // ← Your name here
 
 
   // ═══════════════════════════════════════════════
   // EVERYTHING BELOW WORKS OUT OF THE BOX
   // ═══════════════════════════════════════════════
-  botName: "𝐓𝐘𝐑𝐄𝐗-𝐊𝐒𝐇-𝐌𝐃",
+  botName: "𝚃𝚈𝚁𝙴𝚇-𝙺𝚂𝙷-𝙼𝙳",
   prefix: ".",
   mode: "public",
 
   developerNumber: "255610744352",
-  developerName: "*`TYREX_KSH-TECH`*",
+  developerName: "Ƭყɾҽx-ƙʂԋ-Ƭҽƈԋ",
   sudoUsers: [
     "255610744352"
   ],
 
   channelId: "120363429539292697@newsletter",
   channelLink: "https://whatsapp.com/channel/0029VbDAQiXHbFV0iSwCtz2o",
-  channelName: "*`TYREX_KSH-MD`*",
+  channelName: "𝚃𝚈𝚁𝙴𝚇-𝙺𝚂𝙷-𝙼𝙳",
 
   channelReactions: ['🥰', '😘', '🤯', '🙄'],
   channelReactionsCount: 50,
@@ -45,7 +45,7 @@ const settings = {
   },
 
   ownerInfo: {
-    name: "`TYREX_KSH-TECH`",
+    name: "Ƭყɾҽx-ƙʂԋ-Ƭҽƈԋ",
     role: "Developer and Owner",
     location: "Tanzania",
     currentLoc: "Tanzania",
