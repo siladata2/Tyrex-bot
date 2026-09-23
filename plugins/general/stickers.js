@@ -14,7 +14,7 @@ const webp = require('node-webpmux');
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
 const { downloadContentFromMessage, downloadMediaMessage } = require('@whiskeysockets/baileys');
 const { igdl } = require('ruhend-scraper');
-const settings = require('../settings');
+const settings = require('../../settings');
 
 /* ===================== CONFIG ===================== */
 const PACK = () => settings.packname || 'TYREX_KSH MD';
