@@ -59,7 +59,7 @@ const settings = {
     email: "tyrexksh@example.com"
   },
 
-  footer: "> © 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐁𝐲 𝐓𝐲𝐫𝐞𝐱-𝐊𝐬𝐡-𝐓𝐞𝐜𝐡",
+  footer: "*`Ƭყɾҽx ƙʂԋ Ƭҽƈԋ`*",
   reactionSuccess: "✅",
   reactionError: "❌",
 
