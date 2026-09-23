@@ -1,11 +1,12 @@
 /**
- * NEXORA MD - Menu Command (Multi-Theme)
+ * TYREX-KSH-MD - Menu Command (Multi-Theme)
  * Renders menu in the current theme. Image fetched via axios buffer.
  */
 
 const settings = require('../../settings');
 const axios = require('axios');
 const ui = require('../../lib/ui');
+const prefixLib = require('../../lib/prefix');
 
 const MENU_REACTIONS = ['👑', '✨', '🌟', '🔥', '💫', '⭐', '🎯', '🚀', '💎', '🎉'];
 
@@ -102,10 +103,10 @@ function buildCategories() {
 function infoLines(pushName) {
   const currentMode = global.botMode ? String(global.botMode).toUpperCase() : 'PUBLIC';
   return {
-    botName: settings.botName || 'NEXORA MD',
+    botName: settings.botName || 'TYREX-KSH-MD',
     owner: settings.botOwner || 'Rodgers',
     dev: settings.developerName || 'RODGERS',
-    prefix: settings.prefix || '.',
+    prefix: prefixLib.getPrefix(settings.prefix || '.'),
     user: pushName || 'User',
     mode: currentMode,
     uptime: uptime(),
@@ -124,7 +125,7 @@ function infoLines(pushName) {
 function render1(info, categories, total, prefix) {
   let t = `╔═══════════════════╗\n`;
   t += `╠  ${info.botName}\n`;
-  t += `╠  𝙿𝚘𝚠𝚎𝚛𝚎𝚍 𝚋𝚢 𝚁𝚘𝚍𝚐𝚎𝚛𝚜\n`;
+  t += `╠  Tyrex\n`;
   t += `╚════════════════════╝\n\n`;
   t += `╠ Owner: ${info.owner}\n`;
   t += `╠ Prefix: ${prefix}\n`;
@@ -404,7 +405,7 @@ module.exports = {
     const pushName = mek.pushName || 'User';
     const info = infoLines(pushName);
     const { categories, total } = buildCategories();
-    const prefix = settings.prefix || '.';
+    const prefix = prefixLib.getPrefix(settings.prefix || '.');
 
     // Theme
     let themeNum = 1;
