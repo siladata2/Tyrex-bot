@@ -1,4 +1,5 @@
 const settings = require('../../settings');
+const prefixLib = require('../../lib/prefix');
 const { formatTime, formatBytes } = require('../../lib/myfunc');
 const startTime = Date.now();
 
@@ -21,7 +22,7 @@ module.exports = {
 
 Owner: ${settings.botOwner}
 Developer: ${settings.developerName}
-Prefix: ${settings.prefix}
+Prefix: ${prefixLib.getPrefix(settings.prefix || '.')}
 Mode: ${currentMode}
 Commands: ${totalCommands}
 Uptime: ${uptime}
