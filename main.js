@@ -12,6 +12,7 @@ const axios = require('axios');
 const fs = require('fs');
 const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 const mode = require('./lib/mode');
+const prefixLib = require('./lib/prefix');
 const rateLimit = require('./lib/rateLimit');
 const owner = require('./lib/owner');
 const logger = require('./lib/logger');
@@ -130,7 +131,7 @@ async function handleAutoChatBot(conn, mek) {
     else return;
 
     if (!text) return;
-    if (text.startsWith(settings.prefix || '.')) return;
+    if (text.startsWith(prefixLib.getPrefix(settings.prefix || '.'))) return;
     if (/^[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]+$/u.test(text.trim())) return;
 
     const sender = mek.key.participant || mek.key.remoteJid;
@@ -307,7 +308,8 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
     else if (mek.message.imageMessage) text = mek.message.imageMessage.caption || '';
     else if (mek.message.videoMessage) text = mek.message.videoMessage.caption || '';
 
-    const prefix = settings.prefix || '.';
+    const prefix = prefixLib.getPrefix(settings.prefix || '.');
+    const prefixless = prefixLib.isPrefixless();
     const sender = mek.key.participant || mek.key.remoteJid;
 
     // ═════════════════════════════════════════
@@ -395,9 +397,17 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
     }
 
     if (!text) return;
-    if (!text.startsWith(prefix)) return;
 
-    const afterPrefix = text.slice(prefix.length).trim();
+    let afterPrefix;
+    if (text.startsWith(prefix)) {
+      afterPrefix = text.slice(prefix.length).trim();
+    } else if (prefixless) {
+      afterPrefix = text.trim();
+    } else {
+      return;
+    }
+    if (!afterPrefix) return;
+
     const parts = afterPrefix.split(' ');
     const rawCommand = parts[0];
     const args = parts.slice(1);
@@ -418,6 +428,14 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
     }
 
     const commandName = rawCommand.toLowerCase();
+
+    // In prefixless mode, plain chat text passes through here too —
+    // bail out immediately (silently) if it isn't a real command, so
+    // we never rate-limit or react to normal conversation.
+    const usedPrefix = text.startsWith(prefix);
+    if (!usedPrefix && prefixless && (!global.commands || !global.commands.has(commandName))) {
+      return;
+    }
 
     const isBotOwner = owner.isOwner(sender, conn);
 
@@ -462,13 +480,8 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
           await conn.sendMessage(chatId, { react: { text: settings.reactionError, key: mek.key } });
         } catch (e) {}
       }
-    } else {
-      if (currentMode !== 'private') {
-        await conn.sendMessage(chatId, {
-          text: `Unknown command: ${text}\nType ${prefix}menu`
-        });
-      }
     }
+    // Unknown command → stay silent (no reply, no reaction).
   } catch (error) {
     logger.error(`Error in handleMessages: ${error.message}`);
   }
