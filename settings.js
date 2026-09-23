@@ -28,6 +28,7 @@ const settings = {
   channelReactionsCount: 50,
 
   welcomeImages: [
+    "https://i.ibb.co/n81D0rRq/tyrex.jpg",
     "https://i.ibb.co/n81D0rRq/tyrex.jpg"
   ],
 
