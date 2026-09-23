@@ -28,20 +28,20 @@ const settings = {
   channelReactionsCount: 50,
 
   welcomeImages: [
-    "https://i.postimg.cc/NFtJHrzs/tyrex.png"
+    "https://i.ibb.co/n81D0rRq/tyrex.jpg"
   ],
 
   menuThemes: {
-    1:  { name: "Classic Box",     image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
-    2:  { name: "Double Line",     image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
-    3:  { name: "Minimal",         image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
-    4:  { name: "Bracketed",       image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
-    5:  { name: "Starred",         image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
-    6:  { name: "Arrow",           image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
-    7:  { name: "Dotted",          image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
-    8:  { name: "Double Bracket",  image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
-    9:  { name: "Ornate Crown",    image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" },
-    10: { name: "Gradient Frame",  image: "https://i.postimg.cc/NFtJHrzs/tyrex.png" }
+    1:  { name: "Classic Box",     image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
+    2:  { name: "Double Line",     image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
+    3:  { name: "Minimal",         image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
+    4:  { name: "Bracketed",       image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
+    5:  { name: "Starred",         image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
+    6:  { name: "Arrow",           image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
+    7:  { name: "Dotted",          image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
+    8:  { name: "Double Bracket",  image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
+    9:  { name: "Ornate Crown",    image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
+    10: { name: "Gradient Frame",  image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" }
   },
 
   ownerInfo: {
