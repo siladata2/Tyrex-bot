@@ -105,8 +105,8 @@ module.exports = [
   // COMMAND 2: ID
   // ===============================
   {
-    name: 'id',
-    aliases: ['chatid', 'jid'],
+    name: 'id2',
+    aliases: ['chatid', 'jid2'],
     category: 'utility',
     description: 'Onyesha Chat ID na WhatsApp ID yako',
     usage: '.id',
