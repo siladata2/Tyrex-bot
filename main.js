@@ -19,9 +19,9 @@ const logger = require('./lib/logger');
 
 const cleanNumber = owner.cleanNumber;
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // EMOJI COMMAND DETECTION
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function isEmojiCommand(text) {
   if (!text || text.length === 0) return false;
   const emojiRegex = /^[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}]+$/u;
@@ -34,9 +34,9 @@ function getBotOwnerNumber() {
   return settings.ownerNumber || null;
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MEDIA EXTRACTION (unwraps view-once + document wrappers)
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function extractMedia(quoted) {
   if (!quoted) return null;
 
@@ -65,9 +65,9 @@ async function downloadMedia(mediaInfo) {
   }
 }
 
-// ═══════════════════════════════════════════════════════
-// SILENT REVEAL — internal fallback only
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SILENT REVEAL â€” internal fallback only
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function silentReveal(conn, mek, chatId) {
   try {
     const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -110,9 +110,9 @@ ${settings.footer}`;
   }
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // AUTO CHATBOT (Omegatech AI + fallback)
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function handleAutoChatBot(conn, mek) {
   try {
     if (!global.autoChatBot) return;
@@ -147,7 +147,7 @@ async function handleAutoChatBot(conn, mek) {
     let reply = null;
     let lastError = null;
 
-    // ─── Attempt 1: Omegatech ───
+    // â”€â”€â”€ Attempt 1: Omegatech â”€â”€â”€
     try {
       console.log('[AUTOCHATBOT] Trying: Omegatech');
 
@@ -181,7 +181,7 @@ async function handleAutoChatBot(conn, mek) {
       console.log('[AUTOCHATBOT] Omegatech failed:', e.message);
     }
 
-    // ─── Attempt 2: Pollinations POST ───
+    // â”€â”€â”€ Attempt 2: Pollinations POST â”€â”€â”€
     if (!reply) {
       try {
         console.log('[AUTOCHATBOT] Trying: pollinations (POST)');
@@ -213,7 +213,7 @@ async function handleAutoChatBot(conn, mek) {
       }
     }
 
-    // ─── Attempt 3: Pollinations GET ───
+    // â”€â”€â”€ Attempt 3: Pollinations GET â”€â”€â”€
     if (!reply) {
       try {
         console.log('[AUTOCHATBOT] Trying: pollinations (GET)');
@@ -235,7 +235,7 @@ async function handleAutoChatBot(conn, mek) {
       }
     }
 
-    // ─── Attempt 4: SimSimi ───
+    // â”€â”€â”€ Attempt 4: SimSimi â”€â”€â”€
     if (!reply) {
       try {
         console.log('[AUTOCHATBOT] Trying: simsimi');
@@ -288,9 +288,9 @@ async function handleAutoChatBot(conn, mek) {
   }
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MAIN MESSAGE HANDLER
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function handleMessages(conn, chatUpdate, isOwnerFlag) {
   try {
     const mek = chatUpdate.messages[0];
@@ -312,10 +312,10 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
     const prefixless = prefixLib.isPrefixless();
     const sender = mek.key.participant || mek.key.remoteJid;
 
-    // ═════════════════════════════════════════
-    // PRIORITY 1 — SILENT VIEW-ONCE REVEAL (.emoji)
-    // Runs BEFORE anything else — owner only, silent
-    // ═════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // PRIORITY 1 â€” SILENT VIEW-ONCE REVEAL (.emoji)
+    // Runs BEFORE anything else â€” owner only, silent
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     if (text && text.startsWith(prefix) && text.length > prefix.length) {
       const afterPrefixCheck = text.slice(prefix.length).trim();
 
@@ -325,7 +325,7 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
         const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
 
         if (!quoted) {
-          console.log('[SILENTVV] No quoted message — skipping');
+          console.log('[SILENTVV] No quoted message â€” skipping');
           return;
         }
 
@@ -338,13 +338,13 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
 
         const isBotOwnerCheck = owner.isOwner(sender, conn);
         if (!isBotOwnerCheck) {
-          console.log('[SILENTVV] Sender is not owner — skipping');
+          console.log('[SILENTVV] Sender is not owner â€” skipping');
           return;
         }
 
         console.log('[SILENTVV] Triggering reveal for', mediaInfo.type);
 
-        // Try the plugin first — TRUST its return value
+        // Try the plugin first â€” TRUST its return value
         let revealed = false;
         try {
           const silentvvPlugin = require('./plugins/owner/silentvv');
@@ -359,7 +359,7 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
 
         // Fallback ONLY if plugin failed
         if (!revealed) {
-          console.log('[SILENTVV] Plugin failed — using internal fallback');
+          console.log('[SILENTVV] Plugin failed â€” using internal fallback');
           await silentReveal(conn, mek, chatId);
         }
 
@@ -370,9 +370,9 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
     // Auto-chatbot runs next
     try { await handleAutoChatBot(conn, mek); } catch (e) {}
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // GROUP WATCHERS
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (chatId.endsWith('@g.us')) {
       try {
         const { antiLinkWatcher } = require('./plugins/group/antilink');
@@ -394,6 +394,13 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
       } catch (e) {
         console.log('[ANTISTATUS] Hook error:', e.message);
       }
+
+      try {
+        const groupGuard = require('./plugins/group/group5');
+        await groupGuard.guardMessages(conn, mek, chatId);
+      } catch (e) {
+        console.log('[GROUPGUARD] Hook error:', e.message);
+      }
     }
 
     if (!text) return;
@@ -412,9 +419,9 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
     const rawCommand = parts[0];
     const args = parts.slice(1);
 
-    // ─────────────────────────────────────────
-    // EMOJI-ONLY REPLY (no prefix) → SILENT REVEAL
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // EMOJI-ONLY REPLY (no prefix) â†’ SILENT REVEAL
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (isEmojiCommand(rawCommand)) {
       const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
       if (quoted) {
@@ -429,7 +436,7 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
 
     const commandName = rawCommand.toLowerCase();
 
-    // In prefixless mode, plain chat text passes through here too —
+    // In prefixless mode, plain chat text passes through here too â€”
     // bail out immediately (silently) if it isn't a real command, so
     // we never rate-limit or react to normal conversation.
     const usedPrefix = text.startsWith(prefix);
@@ -444,9 +451,9 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
 
     if (!isBotOwner && !rateLimit.isAllowed(sender, settings.rateLimitPerMinute || 10)) return;
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // PLUGIN DISPATCH
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (global.commands && global.commands.has(commandName)) {
       const command = global.commands.get(commandName);
 
@@ -481,15 +488,15 @@ async function handleMessages(conn, chatUpdate, isOwnerFlag) {
         } catch (e) {}
       }
     }
-    // Unknown command → stay silent (no reply, no reaction).
+    // Unknown command â†’ stay silent (no reply, no reaction).
   } catch (error) {
     logger.error(`Error in handleMessages: ${error.message}`);
   }
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // GROUP PARTICIPANT UPDATE
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function handleGroupParticipantUpdate(conn, update) {
   try {
     logger.info(`Group update: ${update.id} (${update.action})`);
@@ -521,14 +528,21 @@ async function handleGroupParticipantUpdate(conn, update) {
     } catch (e) {
       console.log('[GROUPEVENTS] Hook error:', e.message);
     }
+
+    try {
+      const groupGuard = require('./plugins/group/group5');
+      await groupGuard.guardParticipants(conn, update);
+    } catch (e) {
+      console.log('[GROUPGUARD] Hook error:', e.message);
+    }
   } catch (error) {
     logger.error(`Group update error: ${error.message}`);
   }
 }
 
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // GROUP METADATA UPDATE (name/description/settings/icon)
-// ═══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function handleGroupMetadataUpdate(conn, updates) {
   try {
     const groupEvents = require('./lib/groupevents');
