@@ -4,7 +4,7 @@ const settings = {
   // EDIT THESE 2 LINES ONLY
   // ═══════════════════════════════════════════════
   ownerNumber: "255610744352",        // ← Your number here
-  botOwner: "TYREX_KSH TECH",         // ← Your name here
+  botOwner: "*TYREX_KSH-TECH*",         // ← Your name here
 
 
   // ═══════════════════════════════════════════════
@@ -15,14 +15,14 @@ const settings = {
   mode: "public",
 
   developerNumber: "255610744352",
-  developerName: "TYREX_KSH-TECH",
+  developerName: "*`TYREX_KSH-TECH`*",
   sudoUsers: [
     "255610744352"
   ],
 
   channelId: "120363429539292697@newsletter",
   channelLink: "https://whatsapp.com/channel/0029VbDAQiXHbFV0iSwCtz2o",
-  channelName: "TYREX_KSH-MD",
+  channelName: "*`TYREX_KSH-MD`*",
 
   channelReactions: ['🥰', '😘', '🤯', '🙄'],
   channelReactionsCount: 50,
@@ -45,7 +45,7 @@ const settings = {
   },
 
   ownerInfo: {
-    name: "TYREX_KSH-TECH",
+    name: "`TYREX_KSH-TECH`",
     role: "Developer and Owner",
     location: "Tanzania",
     currentLoc: "Tanzania",
@@ -59,7 +59,7 @@ const settings = {
     email: "tyrexksh@example.com"
   },
 
-  footer: "*`Ƭყɾҽx ƙʂԋ Ƭҽƈԋ`*",
+  footer: "*`System By Ƭყɾҽx ƙʂԋ Ƭҽƈԋ`*",
   reactionSuccess: "✅",
   reactionError: "❌",
 
