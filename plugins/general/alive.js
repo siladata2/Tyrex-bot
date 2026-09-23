@@ -16,8 +16,8 @@ module.exports = {
     await conn.sendMessage(
       chatId,
       {
-        image: { url: 'https://i.postimg.cc/NFtJHrzs/tyrex.png' },
-        caption: `*✅ Bot iko hai!*\n\n⏱️ Uptime: ${h}h ${m}m ${s}s`
+        image: { url: 'https://i.ibb.co/n81D0rRq/tyrex.jpg' },
+        caption: `*✅ Bot is active!*\n\n⏱️ Uptime: ${h}h ${m}m ${s}s`
       },
       { quoted: mek }
     );
