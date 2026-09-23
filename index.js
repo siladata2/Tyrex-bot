@@ -113,6 +113,7 @@ const { handleMessages, handleGroupParticipantUpdate, handleGroupMetadataUpdate 
 const PhoneNumber = require('awesome-phonenumber');
 const { sleep } = require('./lib/myfunc');
 const mode = require('./lib/mode');
+const prefixLib = require('./lib/prefix');
 const owner = require('./lib/owner');
 const logger = require('./lib/logger');
 const { enableChannelBranding } = require('./lib/channel');
@@ -1063,7 +1064,7 @@ RECOVERED MESSAGE:`;
         setTimeout(async () => {
           try {
             const botNumber = Tyrex.user.id.split(':')[0] + '@s.whatsapp.net';
-            const currentPrefix = settings.prefix || '.';
+            const currentPrefix = prefixLib.getPrefix(settings.prefix || '.');
             const userName = settings.botOwner || 'TYREX_KSH TECH';
             const userNumber = settings.ownerNumber || Tyrex.user.id.split(':')[0];
 
