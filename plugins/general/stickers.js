@@ -1,7 +1,7 @@
 'use strict';
 /* TYREX_KSH MD - Sticker commands (deduplicated, single file)
- * Exports an ARRAY of commands in the same { command, aliases, handler } format
- * used by your bundles, so your loader will pick them up as before.
+ * Exports an ARRAY of commands in the format index.js expects:
+ * { name, aliases, execute(conn, mek, args, chatId, isOwner) }
  */
 
 const fs = require('fs');
@@ -14,14 +14,19 @@ const webp = require('node-webpmux');
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
 const { downloadContentFromMessage, downloadMediaMessage } = require('@whiskeysockets/baileys');
 const { igdl } = require('ruhend-scraper');
-const settings = require('../../settings');
+const settings = require(path.join(process.cwd(), 'settings'));
 
 /* ===================== CONFIG ===================== */
-const PACK = () => settings.packname || 'TYREX_KSH MD';
+const DEFAULT_PACK = settings.packname || 'TYREX_KSH MD';
+const PACK_FILE = path.join(process.cwd(), 'data', 'stickerpack.json');
+const PACK = () => {
+  try { return JSON.parse(fs.readFileSync(PACK_FILE, 'utf8')).name || DEFAULT_PACK; } catch { return DEFAULT_PACK; }
+};
 const AUTHOR = 'TYREX_KSH TECH';
 // Keys/tokens: set these as environment variables (or in settings.js)
 const TENOR_KEY = process.env.TENOR_KEY || 'AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ';
 const TG_TOKEN = () => process.env.TELEGRAM_BOT_TOKEN || settings.telegramBotToken;
+const GIPHY_KEY = () => process.env.GIPHY_API_KEY || settings.giphyApiKey;
 
 const TMP = path.join(process.cwd(), 'tmp');
 if (!fs.existsSync(TMP)) fs.mkdirSync(TMP, { recursive: true });
@@ -251,7 +256,7 @@ function renderBlinkingVideo(text) {
 }
 
 /* ===================== COMMANDS ===================== */
-module.exports = [
+const COMMANDS = [
   /* ---------- .sticker (wa-sticker-formatter, supports types) ---------- */
   {
     command: 'sticker',
@@ -371,16 +376,16 @@ module.exports = [
     usage: '.stickername <new pack name>',
     async handler(sock, message, args, context = {}) {
       const { chatId } = ctx(message, context);
-      if (!message.key.fromMe) {
-        return say(sock, chatId, message, '❌ This command can only be used by the bot itself.');
+      if (!context.isOwner && !message.key.fromMe) {
+        return say(sock, chatId, message, '❌ This command can only be used by the bot owner.');
       }
       const newName = args.join(' ').trim();
       if (!newName) {
         return say(sock, chatId, message, '❌ Please provide a new sticker pack name.\nExample: .stickername TYREX_KSH MD Pack');
       }
       try {
-        const store = require('../lib/lightweight_store');
-        await store.saveSetting('global', 'stickerPackName', newName);
+        fs.mkdirSync(path.dirname(PACK_FILE), { recursive: true });
+        fs.writeFileSync(PACK_FILE, JSON.stringify({ name: newName }));
         await say(sock, chatId, message, `✅ Sticker pack name changed to: *${newName}*`);
       } catch (error) {
         console.error('StickerName error:', error);
@@ -639,7 +644,7 @@ module.exports = [
 
       try {
         const { data } = await axios.get('https://api.giphy.com/v1/gifs/search', {
-          params: { api_key: settings.giphyApiKey, q: query, limit: 1, rating: 'g' }
+          params: { api_key: GIPHY_KEY(), q: query, limit: 1, rating: 'g' }
         });
         const gif = data.data?.[0];
         if (!gif) return say(sock, chatId, message, 'No GIFs found for your search term.');
@@ -740,3 +745,18 @@ module.exports = [
     }
   }
 ];
+
+/* ===================== ADAPTER (bot loader format) ===================== */
+// Your loader expects { name, execute(conn, mek, args, chatId, isOwner) }
+const toBotFormat = (c) => ({
+  name: c.command,
+  aliases: c.aliases || [],
+  category: c.category,
+  description: c.description,
+  usage: c.usage,
+  async execute(conn, mek, args, chatId, isOwner) {
+    return c.handler(conn, mek, args, { chatId, isOwner });
+  }
+});
+
+module.exports = COMMANDS.map(toBotFormat);
