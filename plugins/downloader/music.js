@@ -2,7 +2,7 @@
 /* TYREX_KSH MD - Music commands (deduplicated, single file)
  * Powered by TYREX_KSH TECH
  *
- * Commands: play (also song/mp3/audio), video, lyrics, trending, radio,
+ * Commands: play, play2, song, mp3, audio, video, lyrics, trending, radio,
  *           shazam, spotify, ringtone, soundcloud
  *
  * Optional environment variables:
@@ -120,27 +120,15 @@ async function resolveVideo(query) {
   return ytSearch(query);
 }
 
-// 1) local download (lib/ytdl), 2) fallback to the remote API chain
+// Download through the remote API chain and send as audio
 async function sendSong(sock, message, chatId, video) {
-  let localFile = null;
-  try {
-    let audio;
-    let fileName;
-    try {
-      const local = await require('../lib/ytdl').downloadAudio(video.url, true); // { path, title, ... }
-      localFile = local.path;
-      audio = fs.readFileSync(localFile);
-      fileName = `${(local.title || video.title || 'song').slice(0, 60)}.mp3`;
-    } catch (localErr) {
-      console.log('[MUSIC] local ytdl failed, using API chain:', localErr.message);
-      const d = await downloadAny(video.url, 'mp3');
-      audio = { url: d.downloadUrl };
-      fileName = `${(d.title || video.title || 'song').slice(0, 60)}.mp3`;
-    }
-    await sock.sendMessage(chatId, { audio, mimetype: 'audio/mpeg', fileName, ptt: false }, { quoted: message });
-  } finally {
-    if (localFile) { try { fs.unlinkSync(localFile); } catch {} }
-  }
+  const d = await downloadAny(video.url, 'mp3');
+  await sock.sendMessage(chatId, {
+    audio: { url: d.downloadUrl },
+    mimetype: 'audio/mpeg',
+    fileName: `${(d.title || video.title || 'song').slice(0, 60)}.mp3`,
+    ptt: false
+  }, { quoted: message });
 }
 
 /* ===================== RADIO STATIONS ===================== */
@@ -157,25 +145,25 @@ const STATIONS = {
 };
 
 /* ===================== COMMANDS ===================== */
-module.exports = [
-  /* ---------- .play (also .song / .mp3 / .audio) ---------- */
+const COMMANDS = [
+  /* ---------- .play ---------- */
   {
     command: 'play',
-    aliases: ['plays', 'playsong', 'song', 'mp3', 'audio', 'dlmp3'],
+    aliases: ['plays', 'playsong'],
     category: 'music',
-    description: 'Search and download MP3 from YouTube (name or link)',
+    description: 'Search and download MP3 from YouTube',
     usage: '.play <song name | YouTube URL>',
     async handler(sock, message, args, context = {}) {
       const chatId = chatOf(message, context);
       const query = args.join(' ').trim();
-      if (!query) return say(sock, chatId, message, '*Which song do you want to play?*\nUsage: .play <song name | YouTube link>');
+      if (!query) return say(sock, chatId, message, '*Which song do you want to play?*\nUsage: .play <song name>');
 
       try {
         await say(sock, chatId, message, '🔍 *Searching...*');
         const video = await resolveVideo(query);
 
         const caption =
-          `✅ *${video.title}*\n⏱️ ${video.timestamp}\n👤 ${video.author?.name || ''}\n\n⏳ *Downloading... (may take up to 30s)*`;
+          `✅ *Found:* ${video.title}\n⏱️ ${video.timestamp}\n👤 ${video.author?.name || ''}\n\n⏳ *Downloading... (may take up to 30s)*`;
         if (video.thumbnail) {
           await sock.sendMessage(chatId, { image: { url: video.thumbnail }, caption }, { quoted: message });
         } else {
@@ -192,6 +180,103 @@ module.exports = [
       }
     }
   },
+
+  /* ---------- .play2 (tries every URL the API returns) ---------- */
+  {
+    command: 'play2',
+    aliases: ['mp3fallback', 'playfb'],
+    category: 'music',
+    description: 'Stream MP3 with full URL fallback chain',
+    usage: '.play2 <song name>',
+    async handler(sock, message, args, context = {}) {
+      const chatId = chatOf(message, context);
+      const query = args.join(' ').trim();
+      if (!query) return say(sock, chatId, message, '🎵 Usage: `.play2 <song name>`');
+
+      try {
+        await say(sock, chatId, message, '🔍 Searching...');
+        const video = await ytSearch(query);
+
+        if (video.thumbnail) {
+          await sock.sendMessage(chatId, {
+            image: { url: video.thumbnail },
+            caption: `*🎵 ${video.title}*\n⏱️ ${video.timestamp}\n📢 ${video.author.name}\n\n🔄 Fetching URLs...`
+          }, { quoted: message });
+        }
+
+        const { data: apiResp } = await axios.get(QASIM_API, {
+          params: { apiKey: QASIM_KEY, format: 'mp3', url: video.url },
+          timeout: 120000
+        }).catch(() => ({ data: {} }));
+
+        const urlsToTry = [];
+        if (apiResp?.data?.downloadUrl) urlsToTry.push(apiResp.data.downloadUrl);
+        if (apiResp?.data?.alternativeUrls?.length) apiResp.data.alternativeUrls.forEach((a) => urlsToTry.push(a.url));
+        urlsToTry.push('__cobalt__');
+
+        let sent = false;
+        let lastErr = null;
+        for (const candidate of urlsToTry) {
+          try {
+            let finalUrl = candidate;
+            if (finalUrl === '__cobalt__') {
+              finalUrl = (await cobaltFallback(video.url, true)).downloadUrl;
+            } else {
+              await axios.head(finalUrl, { timeout: 8000 });
+            }
+            await sock.sendMessage(chatId, {
+              audio: { url: finalUrl },
+              mimetype: 'audio/mpeg',
+              fileName: `${video.title}.mp3`
+            }, { quoted: message });
+            sent = true;
+            break;
+          } catch (e) { lastErr = e; }
+        }
+        if (!sent) throw new Error(`All ${urlsToTry.length} URLs failed. Last: ${lastErr?.message}`);
+      } catch (e) {
+        await say(sock, chatId, message, `❌ Play2 failed: ${e.message}`);
+      }
+    }
+  },
+
+  /* ---------- .song / .mp3 / .audio (separate commands, same function) ---------- */
+  ...[
+    { command: 'song',  aliases: ['dlmp3'], description: 'Download song MP3 from YouTube' },
+    { command: 'mp3',   aliases: [],        description: 'Download MP3 from YouTube' },
+    { command: 'audio', aliases: [],        description: 'Download audio from YouTube' }
+  ].map((c) => ({
+    command: c.command,
+    aliases: c.aliases,
+    category: 'music',
+    description: c.description,
+    usage: `.${c.command} <name | YouTube URL>`,
+    async handler(sock, message, args, context = {}) {
+      const chatId = chatOf(message, context);
+      const query = args.join(' ').trim();
+      if (!query) {
+        return say(sock, chatId, message, `🎵 *Song Downloader*\n\nUsage:\n.${c.command} <song name | YouTube link>`);
+      }
+      try {
+        const video = await resolveVideo(query);
+        if (video.thumbnail) {
+          await sock.sendMessage(chatId, {
+            image: { url: video.thumbnail },
+            caption: `🎵 *${video.title}*\n⏱ ${video.timestamp}\n👤 ${video.author?.name || ''}\n\n⏳ Downloading...`
+          }, { quoted: message });
+        }
+        const dl = await downloadAny(video.url, 'mp3');
+        await sock.sendMessage(chatId, {
+          audio: { url: dl.downloadUrl },
+          mimetype: 'audio/mpeg',
+          fileName: `${dl.title || video.title || 'song'}.mp3`,
+          ptt: false
+        }, { quoted: message });
+      } catch (e) {
+        await say(sock, chatId, message, `❌ ${e.message}`);
+      }
+    }
+  })),
 
   /* ---------- .video ---------- */
   {
@@ -541,3 +626,18 @@ module.exports = [
     }
   }
 ];
+
+/* ===================== ADAPTER (bot loader format) ===================== */
+// Your loader expects { name, execute(conn, mek, args, chatId, isOwner) }
+const toBotFormat = (c) => ({
+  name: c.command,
+  aliases: c.aliases || [],
+  category: c.category,
+  description: c.description,
+  usage: c.usage,
+  async execute(conn, mek, args, chatId, isOwner) {
+    return c.handler(conn, mek, args, { chatId, isOwner });
+  }
+});
+
+module.exports = COMMANDS.map(toBotFormat);
