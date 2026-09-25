@@ -1,3 +1,8 @@
+/**
+ * Multi-Converter Commands (All 10 in 1 File)
+ * Structure: ARRAY of commands (same as totxt/toread files)
+ */
+
 const fs = require('fs');
 const { exec, execFile } = require('child_process');
 const axios = require('axios');
@@ -42,23 +47,23 @@ async function toPtt(buffer) {
 }
 
 //=====================================================================
-// HELPER: Random filename
+// HELPER: Random temp filename
 //=====================================================================
 function randomFile(ext) {
   return path.join(__dirname, `temp_${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`);
 }
 
 //=====================================================================
-// 1. TOPTT - Convert audio to voice note
+// 1. TOPTT
 //=====================================================================
-module.exports = {
+const toptt = {
   name: 'toptt',
   aliases: ['tovoice', 'tovn', 'tovoicenote'],
   category: 'converter',
   description: 'Convert audio to WhatsApp voice note',
   usage: '.toptt (reply to audio)',
   react: '🎙️',
-  async execute(conn, mek, args, chatId) {
+  async execute(conn, mek, args, chatId, isOwner) {
     await conn.sendMessage(chatId, { react: { text: '🎙️', key: mek.key } });
 
     const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -94,16 +99,16 @@ module.exports = {
 };
 
 //=====================================================================
-// 2. TTS - Text to speech
+// 2. TTS
 //=====================================================================
-module.exports = {
+const tts = {
   name: 'tts',
   aliases: ['say'],
   category: 'tools',
   description: 'Convert text or quoted message to speech',
   usage: '.tts <text> (or reply)',
   react: '🔊',
-  async execute(conn, mek, args, chatId) {
+  async execute(conn, mek, args, chatId, isOwner) {
     await conn.sendMessage(chatId, { react: { text: '🔊', key: mek.key } });
 
     const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -134,16 +139,16 @@ module.exports = {
 };
 
 //=====================================================================
-// 3. TOMP3 - Convert audio/video to MP3
+// 3. TOMP3
 //=====================================================================
-module.exports = {
+const tomp3 = {
   name: 'tomp3',
   aliases: ['audioextract', 'toaudio'],
   category: 'converter',
   description: 'Convert quoted audio or video to MP3',
   usage: '.tomp3 (reply to audio/video)',
   react: '🎵',
-  async execute(conn, mek, args, chatId) {
+  async execute(conn, mek, args, chatId, isOwner) {
     await conn.sendMessage(chatId, { react: { text: '🎵', key: mek.key } });
 
     const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -155,7 +160,9 @@ module.exports = {
 
     try {
       const mediaPath = await conn.downloadAndSaveMediaMessage(
-        quoted.videoMessage ? { message: { videoMessage: quoted.videoMessage } } : { message: { audioMessage: quoted.audioMessage } }
+        quoted.videoMessage
+          ? { message: { videoMessage: quoted.videoMessage } }
+          : { message: { audioMessage: quoted.audioMessage } }
       );
       const buffer = fs.readFileSync(mediaPath);
 
@@ -174,16 +181,16 @@ module.exports = {
 };
 
 //=====================================================================
-// 4. TOM4A - Convert audio/video to M4A
+// 4. TOM4A
 //=====================================================================
-module.exports = {
+const tom4a = {
   name: 'tom4a',
   aliases: ['m4a'],
   category: 'converter',
   description: 'Convert quoted audio or video to M4A',
   usage: '.tom4a (reply to audio/video)',
   react: '🎶',
-  async execute(conn, mek, args, chatId) {
+  async execute(conn, mek, args, chatId, isOwner) {
     await conn.sendMessage(chatId, { react: { text: '🎶', key: mek.key } });
 
     const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -195,7 +202,9 @@ module.exports = {
 
     try {
       const mediaPath = await conn.downloadAndSaveMediaMessage(
-        quoted.videoMessage ? { message: { videoMessage: quoted.videoMessage } } : { message: { audioMessage: quoted.audioMessage } }
+        quoted.videoMessage
+          ? { message: { videoMessage: quoted.videoMessage } }
+          : { message: { audioMessage: quoted.audioMessage } }
       );
       const buffer = fs.readFileSync(mediaPath);
 
@@ -214,16 +223,16 @@ module.exports = {
 };
 
 //=====================================================================
-// 5. TOIMG - Sticker to image
+// 5. TOIMG
 //=====================================================================
-module.exports = {
+const toimg = {
   name: 'toimg',
   aliases: ['sticker2img', 'webp2png'],
   category: 'converter',
   description: 'Convert quoted sticker to image',
   usage: '.toimg (reply to sticker)',
   react: '🖼️',
-  async execute(conn, mek, args, chatId) {
+  async execute(conn, mek, args, chatId, isOwner) {
     await conn.sendMessage(chatId, { react: { text: '🖼️', key: mek.key } });
 
     const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -258,16 +267,16 @@ module.exports = {
 };
 
 //=====================================================================
-// 6. IMGSIZE - Get image dimensions
+// 6. IMGSIZE
 //=====================================================================
-module.exports = {
+const imgsize = {
   name: 'imgsize',
   aliases: ['imagesize', 'dimension'],
   category: 'utility',
   description: 'Get dimensions of quoted image',
   usage: '.imgsize (reply to image)',
   react: '📐',
-  async execute(conn, mek, args, chatId) {
+  async execute(conn, mek, args, chatId, isOwner) {
     await conn.sendMessage(chatId, { react: { text: '📐', key: mek.key } });
 
     const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -281,7 +290,7 @@ module.exports = {
       try { fs.unlinkSync(mediaPath); } catch {}
 
       if (err || !stdout) {
-        return conn.sendMessage(chatId, { text: '❌ Couldn\'t detect dimensions.' }, { quoted: mek });
+        return conn.sendMessage(chatId, { text: "❌ Couldn't detect dimensions." }, { quoted: mek });
       }
 
       await conn.sendMessage(chatId, { text: `🖼️ Dimensions: ${stdout.trim()}` }, { quoted: mek });
@@ -291,16 +300,16 @@ module.exports = {
 };
 
 //=====================================================================
-// 7. RESIZE - Resize image
+// 7. RESIZE
 //=====================================================================
-module.exports = {
+const resize = {
   name: 'resize',
   aliases: ['imgresize'],
   category: 'utility',
   description: 'Resize quoted image to given dimensions',
   usage: '.resize 300×250 (reply to image)',
   react: '🖼️',
-  async execute(conn, mek, args, chatId) {
+  async execute(conn, mek, args, chatId, isOwner) {
     await conn.sendMessage(chatId, { react: { text: '🖼️', key: mek.key } });
 
     const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -341,16 +350,16 @@ module.exports = {
 };
 
 //=====================================================================
-// 8. TRIM - Trim audio/video
+// 8. TRIM
 //=====================================================================
-module.exports = {
+const trim = {
   name: 'trim',
   aliases: ['cut'],
   category: 'utility',
   description: 'Trim quoted audio or video',
   usage: '.trim 0:10 0:30 (reply to media)',
   react: '✂️',
-  async execute(conn, mek, args, chatId) {
+  async execute(conn, mek, args, chatId, isOwner) {
     await conn.sendMessage(chatId, { react: { text: '✂️', key: mek.key } });
 
     const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -371,7 +380,9 @@ module.exports = {
 
     try {
       const mediaPath = await conn.downloadAndSaveMediaMessage(
-        isAudio ? { message: { audioMessage: quoted.audioMessage } } : { message: { videoMessage: quoted.videoMessage } }
+        isAudio
+          ? { message: { audioMessage: quoted.audioMessage } }
+          : { message: { videoMessage: quoted.videoMessage } }
       );
       const outputExt = isAudio ? '.mp3' : '.mp4';
       const outputPath = randomFile(outputExt);
@@ -400,16 +411,16 @@ module.exports = {
 };
 
 //=====================================================================
-// 9. VOLUME - Adjust volume
+// 9. VOLUME
 //=====================================================================
-module.exports = {
+const volume = {
   name: 'volume',
   aliases: ['vol'],
   category: 'utility',
   description: 'Adjust volume of quoted audio/video',
   usage: '.volume 1.5 (reply to media)',
   react: '🔉',
-  async execute(conn, mek, args, chatId) {
+  async execute(conn, mek, args, chatId, isOwner) {
     await conn.sendMessage(chatId, { react: { text: '🔉', key: mek.key } });
 
     const q = args.join(' ').trim();
@@ -426,7 +437,9 @@ module.exports = {
 
     try {
       const mediaPath = await conn.downloadAndSaveMediaMessage(
-        isAudio ? { message: { audioMessage: quoted.audioMessage } } : { message: { videoMessage: quoted.videoMessage } }
+        isAudio
+          ? { message: { audioMessage: quoted.audioMessage } }
+          : { message: { videoMessage: quoted.videoMessage } }
       );
       const outputExt = isAudio ? '.mp3' : '.mp4';
       const outputPath = randomFile(outputExt);
@@ -455,16 +468,16 @@ module.exports = {
 };
 
 //=====================================================================
-// 10. AMPLIFY - Replace video audio with URL
+// 10. AMPLIFY
 //=====================================================================
-module.exports = {
+const amplify = {
   name: 'amplify',
   aliases: ['replaceaudio', 'mergeaudio'],
   category: 'utility',
   description: 'Replace quoted video audio with URL',
   usage: '.amplify <audio_url> (reply to video)',
   react: '🔊',
-  async execute(conn, mek, args, chatId) {
+  async execute(conn, mek, args, chatId, isOwner) {
     await conn.sendMessage(chatId, { react: { text: '🔊', key: mek.key } });
 
     const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -509,3 +522,19 @@ module.exports = {
     }
   }
 };
+
+//=====================================================================
+// EXPORT ALL 10 COMMANDS (ARRAY - kama zile za txt)
+//=====================================================================
+module.exports = [
+  toptt,
+  tts,
+  tomp3,
+  tom4a,
+  toimg,
+  imgsize,
+  resize,
+  trim,
+  volume,
+  amplify
+];
