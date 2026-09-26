@@ -1,6 +1,6 @@
 module.exports = {
-  name: 'ping2',
-  aliases: ['speed2', 'latency2'],
+  name: 'ping',
+  aliases: ['p', 'pong'],
   category: 'system',
   description: 'To check bot speed',
   usage: '.ping2',
@@ -14,8 +14,8 @@ module.exports = {
       const senderNumber = sender.split('@')[0];
 
       // Bot name & author
-      const botname = 'Bot';
-      const author = 'Bot Owner';
+      const botname = '𝚃𝚈𝚁𝙴𝚇-𝙺𝚂𝙷-𝙼𝙳';
+      const author = 'Ƭყɾҽx ƙʂԋ Ƭҽƈԋ';
 
       // Fake contact message (quoted style)
       const contactMessage = {
