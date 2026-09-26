@@ -18,6 +18,7 @@
     "awesome-phonenumber": "^5.7.0",
     "axios": "^1.7.2",
     "chalk": "^4.1.2",
+    "gifted-btns": "latest",
     "cheerio": "^1.0.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
