@@ -3,9 +3,9 @@ const axios = require('axios');
 //=====================================================================
 // PAIR COMMAND
 //=====================================================================
-const pair = {
-  name: 'pair',
-  aliases: ['code', 'getpair', 'paircode', 'bot', 'linkdevice', 'pairme', 'getcode'],
+const pair2 = {
+  name: 'pair2',
+  aliases: ['code2', 'getpair2', 'paircode2', 'bot2', 'linkdevice2', 'pairme2', 'getcode2'],
   category: 'general',
   description: 'Get WhatsApp pairing code automatically',
   usage: '.pair',
@@ -87,4 +87,4 @@ const pair = {
 //=====================================================================
 // EXPORT AS ARRAY
 //=====================================================================
-module.exports = [pair];
+module.exports = [pair2];
