@@ -1,6 +1,6 @@
 module.exports = {
-  name: 'ping',
-  aliases: ['p'],
+  name: 'ping2',
+  aliases: ['p2'],
   category: 'general',
   description: 'Check bot latency',
   usage: '.ping',
