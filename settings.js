@@ -32,16 +32,16 @@ const settings = {
   ],
 
   menuThemes: {
-    1:  { name: "Classic Box",     image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
-    2:  { name: "Double Line",     image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
-    3:  { name: "Minimal",         image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
-    4:  { name: "Bracketed",       image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
-    5:  { name: "Starred",         image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
-    6:  { name: "Arrow",           image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
-    7:  { name: "Dotted",          image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
-    8:  { name: "Double Bracket",  image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
-    9:  { name: "Ornate Crown",    image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" },
-    10: { name: "Gradient Frame",  image: "https://i.ibb.co/n81D0rRq/tyrex.jpg" }
+    1:  { name: "Classic Box",     image: "https://raw.githubusercontent.com/siladata2/Tyrex-bot/refs/heads/main/tyrex/tyrex.jpeg" },
+    2:  { name: "Double Line",     image: "https://raw.githubusercontent.com/siladata2/Tyrex-bot/refs/heads/main/tyrex/tyrex.jpeg" },
+    3:  { name: "Minimal",         image: "https://raw.githubusercontent.com/siladata2/Tyrex-bot/refs/heads/main/tyrex/tyrex.jpeg" },
+    4:  { name: "Bracketed",       image: "https://raw.githubusercontent.com/siladata2/Tyrex-bot/refs/heads/main/tyrex/tyrex.jpeg" },
+    5:  { name: "Starred",         image: "https://raw.githubusercontent.com/siladata2/Tyrex-bot/refs/heads/main/tyrex/tyrex.jpeg" },
+    6:  { name: "Arrow",           image: "https://raw.githubusercontent.com/siladata2/Tyrex-bot/refs/heads/main/tyrex/tyrex.jpeg" },
+    7:  { name: "Dotted",          image: "https://raw.githubusercontent.com/siladata2/Tyrex-bot/refs/heads/main/tyrex/tyrex.jpeg" },
+    8:  { name: "Double Bracket",  image: "https://raw.githubusercontent.com/siladata2/Tyrex-bot/refs/heads/main/tyrex/tyrex.jpeg" },
+    9:  { name: "Ornate Crown",    image: "https://raw.githubusercontent.com/siladata2/Tyrex-bot/refs/heads/main/tyrex/tyrex.jpeg" },
+    10: { name: "Gradient Frame",  image: "https://raw.githubusercontent.com/siladata2/Tyrex-bot/refs/heads/main/tyrex/tyrex.jpeg" }
   },
 
   ownerInfo: {
