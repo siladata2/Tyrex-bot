@@ -22,9 +22,9 @@
 
 <table>
 <tr>
-<td><img src="https://files.catbox.moe/p8xi4o.jpeg" width="260"/></td>
-<td><img src="https://files.catbox.moe/p8xi4o.jpeg" width="260"/></td>
-<td><img src="https://files.catbox.moe/p8xi4o.jpeg" width="260"/></td>
+<td><img src="https://h.uguu.se/rnpLuqXn.jpg" width="260"/></td>
+<td><img src="https://n.uguu.se/fYvsoRwV.jpg" width="260"/></td>
+<td><img src="https://n.uguu.se/gVohiadZ.jpg" width="260"/></td>
 </tr>
 <tr>
 <td align="center"><b>Dashboard</b></td>
