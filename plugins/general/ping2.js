@@ -1,21 +1,19 @@
 module.exports = {
   name: 'ping',
-  aliases: ['p', 'pong'],
+  aliases: ['p', 'pong', 'speed', 'latency'],
   category: 'system',
   description: 'To check bot speed',
-  usage: '.ping2',
+  usage: '.ping',
   react: '🏓',
   async execute(conn, mek, args, chatId, isOwner) {
     try {
-      const startTime = Date.now();
+      // Bot name & author
+      const botname = '𝚃𝚈𝚁𝙴𝚇-𝙺𝚂𝙷-𝙼𝙳';
+      const author = 'Ƭყɾҽx ƙʂԋ Ƭҽƈԋ';
 
       // Get sender info
       const sender = mek.key?.participant || mek.key?.remoteJid || 'unknown@s.whatsapp.net';
       const senderNumber = sender.split('@')[0];
-
-      // Bot name & author
-      const botname = '𝚃𝚈𝚁𝙴𝚇-𝙺𝚂𝙷-𝙼𝙳';
-      const author = 'Ƭყɾҽx ƙʂԋ Ƭҽƈԋ';
 
       // Fake contact message (quoted style)
       const contactMessage = {
@@ -28,15 +26,36 @@ module.exports = {
         }
       };
 
-      const pingSpeed = Date.now() - startTime;
+      // Step 1: Measure real API latency (start → send)
+      const start = Date.now();
 
-      await conn.sendMessage(chatId, {
-        text: `${botname} speed\n\n *${pingSpeed.toFixed(4)} ms*`
+      // Send initial "pinging..." message
+      const sent = await conn.sendMessage(chatId, {
+        text: `🏓 *Pinging...*`
       }, { quoted: contactMessage });
 
+      const latency = Date.now() - start;
+
+      // Step 2: Wait a moment, then edit with real results
+      await new Promise(r => setTimeout(r, 800));
+
+      const finalText =
+        `🏓 *PONG!*\n\n` +
+        `⚡ *Speed:* ${latency} ms\n` +
+        `📡 *Latency:* ${latency < 100 ? 'Excellent 🟢' : latency < 300 ? 'Good 🟡' : 'Slow 🔴'}\n` +
+        `⏱️ *Timestamp:* ${new Date().toLocaleTimeString('en-GB', { timeZone: 'Africa/Nairobi' })}\n\n` +
+        `> *${botname}*`;
+
+      // Step 3: Edit the message with real results
+      await conn.sendMessage(chatId, {
+        text: finalText,
+        edit: sent.key
+      });
+
       await conn.sendMessage(chatId, { react: { text: '✅', key: mek.key } });
+
     } catch (err) {
-      console.error('Ping2 error:', err);
+      console.error('Ping error:', err);
       await conn.sendMessage(chatId, { text: '❌ Error checking speed.' }, { quoted: mek });
     }
   }
