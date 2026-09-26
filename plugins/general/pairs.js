@@ -1,5 +1,4 @@
 const axios = require('axios');
-const { sendButtons } = require('gifted-btns');
 
 //=====================================================================
 // PAIR COMMAND
@@ -8,7 +7,7 @@ const pair = {
   name: 'pair',
   aliases: ['code', 'getpair', 'paircode', 'bot', 'linkdevice'],
   category: 'general',
-  description: 'Generate pairing code and copy it',
+  description: 'Generate pairing code with instructions',
   usage: '.pair <number>',
   react: '🔗',
   async execute(conn, mek, args, chatId, isOwner) {
@@ -33,7 +32,7 @@ const pair = {
     const botname = 'TYREX_KSH MD';
 
     try {
-      // ✅ Endpoint sahihi kutoka logs zako: /code?number=
+      // ✅ Endpoint sahihi: /code?number=
       const response = await axios.get(`${api}/code?number=${q}`, {
         timeout: 90000,
         headers: { 'User-Agent': 'Mozilla/5.0' }
@@ -41,7 +40,6 @@ const pair = {
 
       const data = response.data;
 
-      // Extract code kutoka JSON ya API yako
       const code =
         data?.code ||
         data?.result ||
@@ -56,28 +54,23 @@ const pair = {
         }, { quoted: mek });
       }
 
-      const messageText =
-        `🔑 *Pairing Code Generated*\n\n` +
-        `• *Number:* ${q}\n` +
-        `• *Code:* \`${code}\`\n\n` +
-        `Tap the button below to copy the code.`;
+      const caption =
+        `🔑 *PAIRING CODE GENERATED*\n\n` +
+        `📱 *Number:* ${q}\n` +
+        `🔐 *Code:* \`${code}\`\n\n` +
+        `━━━━━━━━━━━━━━━━━━\n` +
+        `*HOW TO USE YOUR CODE*\n` +
+        `━━━━━━━━━━━━━━━━━━\n\n` +
+        `1️⃣ Open WhatsApp on your phone\n` +
+        `2️⃣ Tap the three dots (menu) at the top right corner\n` +
+        `3️⃣ Select "Linked Devices"\n` +
+        `4️⃣ Tap "Link a Device"\n` +
+        `5️⃣ Tap "Link with phone number instead"\n` +
+        `6️⃣ Enter the 8-digit code shown above\n\n` +
+        `✅ Your session ID will arrive on WhatsApp shortly!\n\n` +
+        `> *${botname}*`;
 
-      await sendButtons(conn, chatId, {
-        title: '',
-        text: messageText,
-        footer: `> *${botname}*`,
-        buttons: [
-          {
-            name: 'cta_copy',
-            buttonParamsJson: JSON.stringify({
-              display_text: '📋 Copy Pairing Code',
-              id: 'copy_pair',
-              copy_code: code
-            })
-          }
-        ]
-      }, { quoted: mek });
-
+      await conn.sendMessage(chatId, { text: caption }, { quoted: mek });
       await conn.sendMessage(chatId, { react: { text: '✅', key: mek.key } });
 
     } catch (err) {
