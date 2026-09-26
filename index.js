@@ -492,6 +492,27 @@ async function startTyrex() {
     // ─────────────────────────────────────────
     const preWipeSend = Tyrex.sendMessage.bind(Tyrex);
     Tyrex.sendMessage = async function(jid, content, options = {}) {
+      // Prevent accidental blank WhatsApp messages. Some plugins can end up
+      // passing { text: ''/undefined } (often together with contextInfo).
+      // WhatsApp may render those as empty bubbles like the ones seen in chat.
+      // Keep real control messages (reactions, deletes, protocol messages) intact.
+      const isControlMessage = !!(content && (
+        content.react || content.delete || content.protocolMessage ||
+        content.poll || content.pollCreationMessage || content.pollUpdateMessage
+      ));
+      const hasText = typeof content?.text === 'string' && content.text.trim().length > 0;
+      const hasMedia = !!(content && (
+        content.image || content.video || content.audio || content.document ||
+        content.sticker || content.contact || content.contacts ||
+        content.location || content.liveLocation || content.buttons ||
+        content.template || content.list || content.product || content.productList
+      ));
+
+      if (content && typeof content === 'object' && !isControlMessage && !hasText && !hasMedia) {
+        logger.warn(`[SEND-GUARD] Blocked empty message to ${jid}`);
+        return null;
+      }
+
       try {
         const result = await preWipeSend(jid, content, options);
 
