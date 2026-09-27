@@ -464,16 +464,20 @@ async function startTyrex() {
       syncFullHistory: false,
       downloadHistory: false,
       generateHighQualityLinkPreview: false,
+      // ═══════════════════════════════════════════════════════
+      // FIX #1: getMessage imerekebishwa
+      // ═══════════════════════════════════════════════════════
       getMessage: async (key) => {
-  try {
-    const jid = jidNormalizedUser(key.remoteJid);
-    const msg = await store.loadMessage(jid, key.id);
-    if (msg?.message) return msg.message;
-    return undefined; // Usirudishe tupu, rudisha undefined kabisa
-  } catch (e) {
-    return undefined;
-  }
-},
+        if (!key || !key.remoteJid || !key.id) return undefined;
+        try {
+          const jid = jidNormalizedUser(key.remoteJid);
+          const msg = await store.loadMessage(jid, key.id);
+          if (msg?.message) return msg.message;
+          return undefined;
+        } catch (e) {
+          return undefined;
+        }
+      },
       msgRetryCounterCache,
       defaultQueryTimeoutMs: 60000,
       connectTimeoutMs: 60000,
@@ -566,20 +570,11 @@ async function startTyrex() {
         if (processedMessages.has(mek.key.id)) return;
         processedMessages.add(mek.key.id);
 
-        // Save to store
+        // ═══════════════════════════════════════════════════════
+        // FIX #2: Save to store kwa kutumia function mpya saveMessage
+        // ═══════════════════════════════════════════════════════
         try {
-          if (!store.messages[chatId]) store.messages[chatId] = {};
-          store.messages[chatId][mek.key.id] = {
-            key: mek.key,
-            message: mek.message,
-            pushName: mek.pushName,
-            messageTimestamp: mek.messageTimestamp
-          };
-          const keys = Object.keys(store.messages[chatId]);
-          if (keys.length > 200) {
-            const toDelete = keys.slice(0, keys.length - 200);
-            toDelete.forEach(k => delete store.messages[chatId][k]);
-          }
+          store.saveMessage(chatId, mek);
         } catch (e) {}
 
         mek.message = (Object.keys(mek.message)[0] === 'ephemeralMessage')
