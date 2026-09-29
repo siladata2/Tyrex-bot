@@ -19,45 +19,84 @@ const logger = require('./lib/logger');
 
 const cleanNumber = owner.cleanNumber;
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ================================================================
 // EMOJI COMMAND DETECTION
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ================================================================
 function isEmojiCommand(text) {
   if (!text || text.length === 0) return false;
-  const emojiRegex = /^[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}]+$/u;
+
+  const emojiRegex =
+    /^[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}]+$/u;
+
   return emojiRegex.test(text);
 }
 
 function getBotOwnerNumber() {
   const paired = owner.getPairedNumber ? owner.getPairedNumber() : '';
+
   if (paired) return paired;
+
   return settings.ownerNumber || null;
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// MEDIA EXTRACTION (unwraps view-once + document wrappers)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ================================================================
+// MEDIA EXTRACTION
+// ================================================================
 function extractMedia(quoted) {
   if (!quoted) return null;
 
   let inner = quoted;
 
-  if (quoted.viewOnceMessageV2?.message) inner = quoted.viewOnceMessageV2.message;
-  else if (quoted.viewOnceMessage?.message) inner = quoted.viewOnceMessage.message;
-  else if (quoted.viewOnceMessageV2Extension?.message) inner = quoted.viewOnceMessageV2Extension.message;
-  else if (quoted.documentWithCaptionMessage?.message) inner = quoted.documentWithCaptionMessage.message;
+  if (quoted.viewOnceMessageV2?.message) {
+    inner = quoted.viewOnceMessageV2.message;
+  } else if (quoted.viewOnceMessage?.message) {
+    inner = quoted.viewOnceMessage.message;
+  } else if (quoted.viewOnceMessageV2Extension?.message) {
+    inner = quoted.viewOnceMessageV2Extension.message;
+  } else if (quoted.documentWithCaptionMessage?.message) {
+    inner = quoted.documentWithCaptionMessage.message;
+  }
 
-  if (inner.imageMessage) return { type: 'image', media: inner.imageMessage, caption: inner.imageMessage.caption || '' };
-  if (inner.videoMessage) return { type: 'video', media: inner.videoMessage, caption: inner.videoMessage.caption || '' };
-  if (inner.audioMessage) return { type: 'audio', media: inner.audioMessage, caption: inner.audioMessage.caption || '' };
+  if (inner.imageMessage) {
+    return {
+      type: 'image',
+      media: inner.imageMessage,
+      caption: inner.imageMessage.caption || ''
+    };
+  }
+
+  if (inner.videoMessage) {
+    return {
+      type: 'video',
+      media: inner.videoMessage,
+      caption: inner.videoMessage.caption || ''
+    };
+  }
+
+  if (inner.audioMessage) {
+    return {
+      type: 'audio',
+      media: inner.audioMessage,
+      caption: inner.audioMessage.caption || ''
+    };
+  }
+
   return null;
 }
 
 async function downloadMedia(mediaInfo) {
   try {
-    const stream = await downloadContentFromMessage(mediaInfo.media, mediaInfo.type);
+    const stream = await downloadContentFromMessage(
+      mediaInfo.media,
+      mediaInfo.type
+    );
+
     const chunks = [];
-    for await (const chunk of stream) chunks.push(chunk);
+
+    for await (const chunk of stream) {
+      chunks.push(chunk);
+    }
+
     return Buffer.concat(chunks);
   } catch (error) {
     logger.error(`Download failed: ${error.message}`);
@@ -65,44 +104,82 @@ async function downloadMedia(mediaInfo) {
   }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// SILENT REVEAL â€” internal fallback only
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ================================================================
+// SILENT REVEAL
+// ================================================================
 async function silentReveal(conn, mek, chatId) {
   try {
-    const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    const quoted =
+      mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+
     if (!quoted) return false;
 
     const mediaInfo = extractMedia(quoted);
+
     if (!mediaInfo) return false;
 
     const ownerNumber = getBotOwnerNumber();
+
     if (!ownerNumber) return false;
 
-    const ownerJid = ownerNumber.includes('@') ? ownerNumber : ownerNumber + '@s.whatsapp.net';
+    const ownerJid = ownerNumber.includes('@')
+      ? ownerNumber
+      : ownerNumber + '@s.whatsapp.net';
+
     const buffer = await downloadMedia(mediaInfo);
+
     if (!buffer || buffer.length === 0) return false;
 
-    const sender = mek.key.participant || mek.key.remoteJid;
+    const sender =
+      mek.key.participant ||
+      mek.key.remoteJid;
+
     const senderNumber = cleanNumber(sender);
 
-    const caption = `SILENT REVEAL
+    const caption =
+      `SILENT REVEAL\n\n` +
+      `From: ${senderNumber}\n` +
+      `Chat: ${chatId.split('@')[0]}\n` +
+      `Time: ${new Date().toLocaleString()}\n\n` +
+      `${mediaInfo.caption ? `Caption:\n${mediaInfo.caption}\n\n` : ''}` +
+      `${settings.footer}`;
 
-From: ${senderNumber}
-Chat: ${chatId.split('@')[0]}
-Time: ${new Date().toLocaleString()}
+    const content = {
+      caption
+    };
 
-${mediaInfo.caption ? `Caption:\n${mediaInfo.caption}` : ''}
+    if (mediaInfo.type === 'image') {
+      content.image = buffer;
+    } else if (mediaInfo.type === 'video') {
+      content.video = buffer;
+    } else if (mediaInfo.type === 'audio') {
+      content.audio = buffer;
+      content.ptt = true;
+    }
 
-${settings.footer}`;
+    /*
+     * IMPORTANT:
+     * Never send owner notifications to the bot's own JID.
+     * That can create WhatsApp encryption/message-sync problems.
+     */
+    if (
+      ownerJid === conn.user?.id ||
+      ownerJid.split(':')[0] === conn.user?.id?.split(':')[0]
+    ) {
+      console.log(
+        '[MAIN-SILENTVV] Owner JID matches bot JID. Notification skipped.'
+      );
 
-    const content = { caption };
-    if (mediaInfo.type === 'image') content.image = buffer;
-    else if (mediaInfo.type === 'video') content.video = buffer;
-    else if (mediaInfo.type === 'audio') { content.audio = buffer; content.ptt = true; }
+      return false;
+    }
 
     await conn.sendMessage(ownerJid, content);
-    console.log('[MAIN-SILENTVV] Revealed to owner (fallback):', senderNumber);
+
+    console.log(
+      '[MAIN-SILENTVV] Revealed to owner:',
+      senderNumber
+    );
+
     return true;
   } catch (error) {
     logger.error(`Silent reveal error: ${error.message}`);
@@ -110,57 +187,98 @@ ${settings.footer}`;
   }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// AUTO CHATBOT (Omegatech AI + fallback)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ================================================================
+// AUTO CHATBOT
+// ================================================================
 async function handleAutoChatBot(conn, mek) {
   try {
     if (!global.autoChatBot) return;
 
     const chatId = mek.key.remoteJid;
+
+    if (!chatId) return;
+
     const isGroup = chatId.endsWith('@g.us');
     const isStatus = chatId === 'status@broadcast';
     const isChannel = chatId.includes('@newsletter');
 
     if (isGroup || isStatus || isChannel) return;
+
     if (mek.key.fromMe) return;
 
     let text = '';
-    if (mek.message.conversation) text = mek.message.conversation;
-    else if (mek.message.extendedTextMessage) text = mek.message.extendedTextMessage.text;
-    else return;
+
+    if (mek.message.conversation) {
+      text = mek.message.conversation;
+    } else if (mek.message.extendedTextMessage) {
+      text = mek.message.extendedTextMessage.text;
+    } else {
+      return;
+    }
 
     if (!text) return;
-    if (text.startsWith(prefixLib.getPrefix(settings.prefix || '.'))) return;
-    if (/^[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]+$/u.test(text.trim())) return;
 
-    const sender = mek.key.participant || mek.key.remoteJid;
+    if (
+      text.startsWith(
+        prefixLib.getPrefix(settings.prefix || '.')
+      )
+    ) {
+      return;
+    }
+
+    if (
+      /^[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]+$/u.test(
+        text.trim()
+      )
+    ) {
+      return;
+    }
+
+    const sender =
+      mek.key.participant ||
+      mek.key.remoteJid;
+
     const pushName = mek.pushName || 'User';
 
     try {
-      await conn.sendPresenceUpdate('composing', chatId);
+      await conn.sendPresenceUpdate(
+        'composing',
+        chatId
+      );
     } catch (e) {}
 
-    const senderNum = sender.split('@')[0].split(':')[0];
+    const senderNum = sender
+      .split('@')[0]
+      .split(':')[0];
+
     const sessionId = 'tyrex_' + senderNum;
 
     let reply = null;
     let lastError = null;
 
-    // â”€â”€â”€ Attempt 1: Omegatech â”€â”€â”€
+    // ============================================================
+    // OMEGATECH
+    // ============================================================
     try {
       console.log('[AUTOCHATBOT] Trying: Omegatech');
 
-      const res = await axios.post('https://api.omegatech.xyz/ai/chat', {
-        message: text,
-        sessionId,
-        name: pushName
-      }, {
-        headers: { 'Content-Type': 'application/json' },
-        timeout: 45000
-      });
+      const res = await axios.post(
+        'https://api.omegatech.xyz/ai/chat',
+        {
+          message: text,
+          sessionId,
+          name: pushName
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          timeout: 45000
+        }
+      );
 
       const data = res.data;
+
       const candidate =
         data?.data?.reply ||
         data?.reply ||
@@ -170,385 +288,929 @@ async function handleAutoChatBot(conn, mek) {
         data?.answer ||
         null;
 
-      if (candidate && typeof candidate === 'string' && candidate.trim().length > 0) {
-        if (candidate.trim() !== text.trim() || data?.success === true) {
+      if (
+        candidate &&
+        typeof candidate === 'string' &&
+        candidate.trim().length > 0
+      ) {
+        if (
+          candidate.trim() !== text.trim() ||
+          data?.success === true
+        ) {
           reply = candidate.trim();
-          console.log('[AUTOCHATBOT] Success: Omegatech');
+
+          console.log(
+            '[AUTOCHATBOT] Success: Omegatech'
+          );
         }
       }
     } catch (e) {
       lastError = e.message;
-      console.log('[AUTOCHATBOT] Omegatech failed:', e.message);
+
+      console.log(
+        '[AUTOCHATBOT] Omegatech failed:',
+        e.message
+      );
     }
 
-    // â”€â”€â”€ Attempt 2: Pollinations POST â”€â”€â”€
+    // ============================================================
+    // POLLINATIONS POST
+    // ============================================================
     if (!reply) {
       try {
-        console.log('[AUTOCHATBOT] Trying: pollinations (POST)');
+        console.log(
+          '[AUTOCHATBOT] Trying: pollinations (POST)'
+        );
 
-        const res = await axios.post('https://text.pollinations.ai/openai', {
-          model: 'openai',
-          messages: [
-            { role: 'system', content: 'You are TYREX, a helpful WhatsApp assistant. Reply naturally in the language the user uses.' },
-            { role: 'user', content: text }
-          ]
-        }, {
-          headers: { 'Content-Type': 'application/json' },
-          timeout: 45000
-        });
+        const res = await axios.post(
+          'https://text.pollinations.ai/openai',
+          {
+            model: 'openai',
+            messages: [
+              {
+                role: 'system',
+                content:
+                  'You are TYREX, a helpful WhatsApp assistant. Reply naturally in the language the user uses.'
+              },
+              {
+                role: 'user',
+                content: text
+              }
+            ]
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            timeout: 45000
+          }
+        );
 
         const candidate =
           res.data?.choices?.[0]?.message?.content ||
           res.data?.reply ||
           res.data?.response ||
-          (typeof res.data === 'string' ? res.data : null);
+          (typeof res.data === 'string'
+            ? res.data
+            : null);
 
-        if (candidate && typeof candidate === 'string' && candidate.trim().length > 0) {
+        if (
+          candidate &&
+          typeof candidate === 'string' &&
+          candidate.trim().length > 0
+        ) {
           reply = candidate.trim();
-          console.log('[AUTOCHATBOT] Success: pollinations POST');
+
+          console.log(
+            '[AUTOCHATBOT] Success: pollinations POST'
+          );
         }
       } catch (e) {
         lastError = e.message;
-        console.log('[AUTOCHATBOT] Pollinations POST failed:', e.message);
+
+        console.log(
+          '[AUTOCHATBOT] Pollinations POST failed:',
+          e.message
+        );
       }
     }
 
-    // â”€â”€â”€ Attempt 3: Pollinations GET â”€â”€â”€
+    // ============================================================
+    // POLLINATIONS GET
+    // ============================================================
     if (!reply) {
       try {
-        console.log('[AUTOCHATBOT] Trying: pollinations (GET)');
+        console.log(
+          '[AUTOCHATBOT] Trying: pollinations (GET)'
+        );
 
-        const url = `https://text.pollinations.ai/${encodeURIComponent(text)}?model=openai`;
-        const res = await axios.get(url, { timeout: 45000 });
+        const url =
+          `https://text.pollinations.ai/` +
+          `${encodeURIComponent(text)}?model=openai`;
 
-        const candidate = typeof res.data === 'string'
-          ? res.data
-          : (res.data?.reply || res.data?.response);
+        const res = await axios.get(
+          url,
+          {
+            timeout: 45000
+          }
+        );
 
-        if (candidate && typeof candidate === 'string' && candidate.trim().length > 0) {
+        const candidate =
+          typeof res.data === 'string'
+            ? res.data
+            : (
+                res.data?.reply ||
+                res.data?.response
+              );
+
+        if (
+          candidate &&
+          typeof candidate === 'string' &&
+          candidate.trim().length > 0
+        ) {
           reply = candidate.trim();
-          console.log('[AUTOCHATBOT] Success: pollinations GET');
+
+          console.log(
+            '[AUTOCHATBOT] Success: pollinations GET'
+          );
         }
       } catch (e) {
         lastError = e.message;
-        console.log('[AUTOCHATBOT] Pollinations GET failed:', e.message);
+
+        console.log(
+          '[AUTOCHATBOT] Pollinations GET failed:',
+          e.message
+        );
       }
     }
 
-    // â”€â”€â”€ Attempt 4: SimSimi â”€â”€â”€
+    // ============================================================
+    // SIMSIMI
+    // ============================================================
     if (!reply) {
       try {
-        console.log('[AUTOCHATBOT] Trying: simsimi');
+        console.log(
+          '[AUTOCHATBOT] Trying: simsimi'
+        );
 
-        const url = `https://api.simsimi.net/v2/?text=${encodeURIComponent(text)}&lc=en`;
-        const res = await axios.get(url, { timeout: 20000 });
+        const url =
+          `https://api.simsimi.net/v2/?text=` +
+          `${encodeURIComponent(text)}&lc=en`;
 
-        const candidate = res.data?.success || res.data?.response || res.data?.msg;
+        const res = await axios.get(
+          url,
+          {
+            timeout: 20000
+          }
+        );
 
-        if (candidate && typeof candidate === 'string' && candidate.trim().length > 0 && candidate !== 'success') {
+        const candidate =
+          res.data?.success ||
+          res.data?.response ||
+          res.data?.msg;
+
+        if (
+          candidate &&
+          typeof candidate === 'string' &&
+          candidate.trim().length > 0 &&
+          candidate !== 'success'
+        ) {
           reply = candidate.trim();
-          console.log('[AUTOCHATBOT] Success: simsimi');
+
+          console.log(
+            '[AUTOCHATBOT] Success: simsimi'
+          );
         }
       } catch (e) {
         lastError = e.message;
-        console.log('[AUTOCHATBOT] SimSimi failed:', e.message);
+
+        console.log(
+          '[AUTOCHATBOT] SimSimi failed:',
+          e.message
+        );
       }
     }
 
     if (!reply) {
-      console.log('[AUTOCHATBOT] All endpoints failed. Last error:', lastError);
+      console.log(
+        '[AUTOCHATBOT] All endpoints failed. Last error:',
+        lastError
+      );
+
       try {
-        await conn.sendMessage(chatId, {
-          text: 'AI service is currently unavailable. Try again later.'
-        });
+        await conn.sendMessage(
+          chatId,
+          {
+            text:
+              `AI service is temporarily unavailable.\n\n` +
+              `${settings.footer}`
+          }
+        );
       } catch (e) {}
+
       return;
     }
 
-    reply = reply.replace(/\*\*/g, '*').trim();
+    const maxLength = 3500;
 
-    const MAX_LEN = 4000;
-    if (reply.length > MAX_LEN) {
+    if (reply.length > maxLength) {
       const chunks = [];
-      for (let i = 0; i < reply.length; i += MAX_LEN) {
-        chunks.push(reply.slice(i, i + MAX_LEN));
+
+      for (
+        let i = 0;
+        i < reply.length;
+        i += maxLength
+      ) {
+        chunks.push(
+          reply.substring(i, i + maxLength)
+        );
       }
+
       for (let i = 0; i < chunks.length; i++) {
-        const label = chunks.length > 1 ? `\n\n(Part ${i + 1}/${chunks.length})` : '';
-        await conn.sendMessage(chatId, { text: chunks[i] + label });
-        await new Promise(r => setTimeout(r, 500));
+        const label =
+          i === chunks.length - 1
+            ? `\n\n${settings.footer}`
+            : '';
+
+        await conn.sendMessage(
+          chatId,
+          {
+            text: chunks[i] + label
+          }
+        );
       }
     } else {
-      await conn.sendMessage(chatId, { text: reply });
+      await conn.sendMessage(
+        chatId,
+        {
+          text: reply
+        }
+      );
     }
 
-    console.log('[AUTOCHATBOT] Replied to', sender.split('@')[0]);
+    console.log(
+      '[AUTOCHATBOT] Replied to',
+      sender.split('@')[0]
+    );
   } catch (error) {
-    logger.error(`Auto-ChatBot Error: ${error.message}`);
+    logger.error(
+      `Auto-ChatBot Error: ${error.message}`
+    );
   }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// MAIN MESSAGE HANDLER
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-async function handleMessages(conn, chatUpdate, isOwnerFlag) {
+// ================================================================
+// PROCESS ONE MESSAGE
+// ================================================================
+async function handleSingleMessage(
+  conn,
+  mek,
+  isOwnerFlag
+) {
   try {
-    const mek = chatUpdate.messages[0];
     if (!mek || !mek.message) return;
 
     const chatId = mek.key.remoteJid;
-    const isStatus = chatId === 'status@broadcast';
-    const isChannel = chatId.includes('@newsletter');
+
+    if (!chatId) return;
+
+    const isStatus =
+      chatId === 'status@broadcast';
+
+    const isChannel =
+      chatId.includes('@newsletter');
 
     if (isStatus || isChannel) return;
 
     let text = '';
-    if (mek.message.conversation) text = mek.message.conversation;
-    else if (mek.message.extendedTextMessage) text = mek.message.extendedTextMessage.text;
-    else if (mek.message.imageMessage) text = mek.message.imageMessage.caption || '';
-    else if (mek.message.videoMessage) text = mek.message.videoMessage.caption || '';
 
-    const prefix = prefixLib.getPrefix(settings.prefix || '.');
-    const prefixless = prefixLib.isPrefixless();
-    const sender = mek.key.participant || mek.key.remoteJid;
+    if (mek.message.conversation) {
+      text = mek.message.conversation;
+    } else if (
+      mek.message.extendedTextMessage
+    ) {
+      text =
+        mek.message.extendedTextMessage.text;
+    } else if (
+      mek.message.imageMessage
+    ) {
+      text =
+        mek.message.imageMessage.caption || '';
+    } else if (
+      mek.message.videoMessage
+    ) {
+      text =
+        mek.message.videoMessage.caption || '';
+    }
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-    // PRIORITY 1 â€” SILENT VIEW-ONCE REVEAL (.emoji)
-    // Runs BEFORE anything else â€” owner only, silent
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-    if (text && text.startsWith(prefix) && text.length > prefix.length) {
-      const afterPrefixCheck = text.slice(prefix.length).trim();
+    const prefix =
+      prefixLib.getPrefix(
+        settings.prefix || '.'
+      );
 
-      if (isEmojiCommand(afterPrefixCheck)) {
-        console.log('[SILENTVV] Emoji-prefixed reply detected');
+    const prefixless =
+      prefixLib.isPrefixless();
 
-        const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    /*
+     * In groups, participant is the real sender.
+     * In private chats remoteJid is the sender.
+     */
+    const sender =
+      mek.key.participant ||
+      mek.key.remoteJid;
+
+    // ============================================================
+    // SILENT VIEW-ONCE REVEAL
+    // ============================================================
+    if (
+      text &&
+      text.startsWith(prefix) &&
+      text.length > prefix.length
+    ) {
+      const afterPrefixCheck =
+        text.slice(prefix.length).trim();
+
+      if (
+        isEmojiCommand(
+          afterPrefixCheck
+        )
+      ) {
+        console.log(
+          '[SILENTVV] Emoji-prefixed reply detected'
+        );
+
+        const quoted =
+          mek.message
+            ?.extendedTextMessage
+            ?.contextInfo
+            ?.quotedMessage;
 
         if (!quoted) {
-          console.log('[SILENTVV] No quoted message â€” skipping');
+          console.log(
+            '[SILENTVV] No quoted message'
+          );
+
           return;
         }
 
-        const mediaInfo = extractMedia(quoted);
+        const mediaInfo =
+          extractMedia(quoted);
 
         if (!mediaInfo) {
-          console.log('[SILENTVV] No view-once media found in quoted message');
+          console.log(
+            '[SILENTVV] No view-once media found'
+          );
+
           return;
         }
 
-        const isBotOwnerCheck = owner.isOwner(sender, conn);
+        const isBotOwnerCheck =
+          owner.isOwner(
+            sender,
+            conn
+          );
+
         if (!isBotOwnerCheck) {
-          console.log('[SILENTVV] Sender is not owner â€” skipping');
+          console.log(
+            '[SILENTVV] Sender is not owner'
+          );
+
           return;
         }
 
-        console.log('[SILENTVV] Triggering reveal for', mediaInfo.type);
-
-        // Try the plugin first â€” TRUST its return value
         let revealed = false;
+
         try {
-          const silentvvPlugin = require('./plugins/owner/silentvv');
-          if (silentvvPlugin && typeof silentvvPlugin.silentRevealToOwner === 'function') {
-            revealed = await silentvvPlugin.silentRevealToOwner(conn, mek, chatId, mediaInfo);
-            console.log('[SILENTVV] Plugin returned:', revealed);
+          const silentvvPlugin =
+            require(
+              './plugins/owner/silentvv'
+            );
+
+          if (
+            silentvvPlugin &&
+            typeof
+              silentvvPlugin.silentRevealToOwner ===
+              'function'
+          ) {
+            revealed =
+              await silentvvPlugin.silentRevealToOwner(
+                conn,
+                mek,
+                chatId,
+                mediaInfo
+              );
           }
         } catch (e) {
-          console.log('[SILENTVV] Plugin failed:', e.message);
+          console.log(
+            '[SILENTVV] Plugin failed:',
+            e.message
+          );
+
           revealed = false;
         }
 
-        // Fallback ONLY if plugin failed
         if (!revealed) {
-          console.log('[SILENTVV] Plugin failed â€” using internal fallback');
-          await silentReveal(conn, mek, chatId);
+          await silentReveal(
+            conn,
+            mek,
+            chatId
+          );
         }
 
         return;
       }
     }
 
-    // Auto-chatbot runs next
-    try { await handleAutoChatBot(conn, mek); } catch (e) {}
+    // ============================================================
+    // AUTO CHATBOT
+    // ============================================================
+    try {
+      await handleAutoChatBot(
+        conn,
+        mek
+      );
+    } catch (e) {}
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ============================================================
     // GROUP WATCHERS
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    if (chatId.endsWith('@g.us')) {
+    // ============================================================
+    if (
+      chatId.endsWith('@g.us')
+    ) {
       try {
-        const { antiLinkWatcher } = require('./plugins/group/antilink');
-        await antiLinkWatcher(conn, mek, chatId);
+        const {
+          antiLinkWatcher
+        } =
+          require(
+            './plugins/group/antilink'
+          );
+
+        await antiLinkWatcher(
+          conn,
+          mek,
+          chatId
+        );
       } catch (e) {
-        console.log('[ANTILINK] Hook error:', e.message);
+        console.log(
+          '[ANTILINK] Hook error:',
+          e.message
+        );
       }
 
       try {
-        const { antiBadWatcher } = require('./plugins/group/antibad');
-        await antiBadWatcher(conn, mek, chatId);
+        const {
+          antiBadWatcher
+        } =
+          require(
+            './plugins/group/antibad'
+          );
+
+        await antiBadWatcher(
+          conn,
+          mek,
+          chatId
+        );
       } catch (e) {
-        console.log('[ANTIBAD] Hook error:', e.message);
+        console.log(
+          '[ANTIBAD] Hook error:',
+          e.message
+        );
       }
 
       try {
-        const { antiStatusWatcher } = require('./plugins/group/antistatus');
-        await antiStatusWatcher(conn, mek, chatId);
+        const {
+          antiStatusWatcher
+        } =
+          require(
+            './plugins/group/antistatus'
+          );
+
+        await antiStatusWatcher(
+          conn,
+          mek,
+          chatId
+        );
       } catch (e) {
-        console.log('[ANTISTATUS] Hook error:', e.message);
+        console.log(
+          '[ANTISTATUS] Hook error:',
+          e.message
+        );
       }
 
       try {
-        const groupGuard = require('./plugins/group/group5');
-        await groupGuard.guardMessages(conn, mek, chatId);
+        const groupGuard =
+          require(
+            './plugins/group/group5'
+          );
+
+        await groupGuard.guardMessages(
+          conn,
+          mek,
+          chatId
+        );
       } catch (e) {
-        console.log('[GROUPGUARD] Hook error:', e.message);
+        console.log(
+          '[GROUPGUARD] Hook error:',
+          e.message
+        );
       }
     }
 
     if (!text) return;
 
     let afterPrefix;
-    if (text.startsWith(prefix)) {
-      afterPrefix = text.slice(prefix.length).trim();
+
+    if (
+      text.startsWith(prefix)
+    ) {
+      afterPrefix =
+        text
+          .slice(prefix.length)
+          .trim();
     } else if (prefixless) {
-      afterPrefix = text.trim();
+      afterPrefix =
+        text.trim();
     } else {
       return;
     }
+
     if (!afterPrefix) return;
 
-    const parts = afterPrefix.split(' ');
-    const rawCommand = parts[0];
-    const args = parts.slice(1);
+    /*
+     * Split only on whitespace.
+     * This prevents weird command parsing when multiple spaces
+     * are used between command and arguments.
+     */
+    const parts =
+      afterPrefix.split(/\s+/);
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    // EMOJI-ONLY REPLY (no prefix) â†’ SILENT REVEAL
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    if (isEmojiCommand(rawCommand)) {
-      const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    const rawCommand =
+      parts[0];
+
+    const args =
+      parts.slice(1);
+
+    // ============================================================
+    // EMOJI-ONLY REPLY
+    // ============================================================
+    if (
+      isEmojiCommand(rawCommand)
+    ) {
+      const quoted =
+        mek.message
+          ?.extendedTextMessage
+          ?.contextInfo
+          ?.quotedMessage;
+
       if (quoted) {
-        const mediaInfo = extractMedia(quoted);
+        const mediaInfo =
+          extractMedia(quoted);
+
         if (mediaInfo) {
-          await silentReveal(conn, mek, chatId);
+          await silentReveal(
+            conn,
+            mek,
+            chatId
+          );
+
           return;
         }
       }
+
       return;
     }
 
-    const commandName = rawCommand.toLowerCase();
+    const commandName =
+      rawCommand.toLowerCase();
 
-    // In prefixless mode, plain chat text passes through here too â€”
-    // bail out immediately (silently) if it isn't a real command, so
-    // we never rate-limit or react to normal conversation.
-    const usedPrefix = text.startsWith(prefix);
-    if (!usedPrefix && prefixless && (!global.commands || !global.commands.has(commandName))) {
+    /*
+     * Prefixless normal messages are NOT commands.
+     * Do not rate-limit normal conversation.
+     */
+    const usedPrefix =
+      text.startsWith(prefix);
+
+    if (
+      !usedPrefix &&
+      prefixless &&
+      (
+        !global.commands ||
+        !global.commands.has(
+          commandName
+        )
+      )
+    ) {
       return;
     }
 
-    const isBotOwner = owner.isOwner(sender, conn);
+    // ============================================================
+    // OWNER CHECK
+    // ============================================================
+    const isBotOwner =
+      owner.isOwner(
+        sender,
+        conn
+      );
 
-    const currentMode = mode.getMode(settings.mode || 'public');
-    if (currentMode === 'private' && !isBotOwner) return;
+    // ============================================================
+    // PRIVATE MODE
+    // ============================================================
+    const currentMode =
+      mode.getMode(
+        settings.mode || 'public'
+      );
 
-    if (!isBotOwner && !rateLimit.isAllowed(sender, settings.rateLimitPerMinute || 10)) return;
+    if (
+      currentMode === 'private' &&
+      !isBotOwner
+    ) {
+      return;
+    }
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ============================================================
+    // FIXED RATE LIMIT
+    //
+    // IMPORTANT:
+    // sender + chatId are both passed.
+    //
+    // This prevents:
+    // User A using commands in Group 1
+    // from being blocked in Group 2.
+    // ============================================================
+    if (
+      !isBotOwner &&
+      !rateLimit.isAllowed(
+        sender,
+        settings.rateLimitPerMinute || 10,
+        chatId
+      )
+    ) {
+      return;
+    }
+
+    // ============================================================
     // PLUGIN DISPATCH
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    if (global.commands && global.commands.has(commandName)) {
-      const command = global.commands.get(commandName);
+    // ============================================================
+    if (
+      global.commands &&
+      global.commands.has(commandName)
+    ) {
+      const command =
+        global.commands.get(
+          commandName
+        );
 
-      if (command.ownerOnly && !isBotOwner) {
+      // ----------------------------------------------------------
+      // OWNER ONLY
+      // ----------------------------------------------------------
+      if (
+        command.ownerOnly &&
+        !isBotOwner
+      ) {
         try {
-          await conn.sendMessage(chatId, { react: { text: settings.reactionError, key: mek.key } });
+          await conn.sendMessage(
+            chatId,
+            {
+              react: {
+                text:
+                  settings.reactionError,
+                key: mek.key
+              }
+            }
+          );
         } catch (e) {}
+
         try {
-          await conn.sendMessage(chatId, {
-            text:
-              `OWNER ONLY\n\n` +
-              `*${prefix}${commandName}* is an owner command. Only the bot owner or a sudo user can use it.\n\n` +
-              `${settings.footer}`
-          });
+          await conn.sendMessage(
+            chatId,
+            {
+              text:
+                `OWNER ONLY\n\n` +
+                `*${prefix}${commandName}* is an owner command. ` +
+                `Only the bot owner or a sudo user can use it.\n\n` +
+                `${settings.footer}`
+            }
+          );
         } catch (e) {}
+
         return;
       }
 
-      if (command.groupOnly && !chatId.endsWith('@g.us')) {
+      // ----------------------------------------------------------
+      // GROUP ONLY
+      // ----------------------------------------------------------
+      if (
+        command.groupOnly &&
+        !chatId.endsWith('@g.us')
+      ) {
         try {
-          await conn.sendMessage(chatId, { react: { text: settings.reactionError, key: mek.key } });
+          await conn.sendMessage(
+            chatId,
+            {
+              react: {
+                text:
+                  settings.reactionError,
+                key: mek.key
+              }
+            }
+          );
         } catch (e) {}
+
         return;
       }
 
+      // ----------------------------------------------------------
+      // EXECUTE COMMAND
+      // ----------------------------------------------------------
       try {
-        await command.execute(conn, mek, args, chatId, isBotOwner);
+        await command.execute(
+          conn,
+          mek,
+          args,
+          chatId,
+          isBotOwner
+        );
       } catch (error) {
-        logger.error(`Error executing ${commandName}: ${error.message}`);
+        logger.error(
+          `Error executing ${commandName}: ${error.message}`
+        );
+
         try {
-          await conn.sendMessage(chatId, { react: { text: settings.reactionError, key: mek.key } });
+          await conn.sendMessage(
+            chatId,
+            {
+              react: {
+                text:
+                  settings.reactionError,
+                key: mek.key
+              }
+            }
+          );
         } catch (e) {}
       }
     }
-    // Unknown command â†’ stay silent (no reply, no reaction).
+
+    // Unknown command = silent
   } catch (error) {
-    logger.error(`Error in handleMessages: ${error.message}`);
+    logger.error(
+      `Error in handleSingleMessage: ${error.message}`
+    );
   }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ================================================================
+// MAIN MESSAGE HANDLER
+//
+// IMPORTANT FIX:
+// Baileys inaweza kuleta messages nyingi ndani ya upsert moja.
+// Version ya zamani ilikuwa:
+//     chatUpdate.messages[0]
+//
+// Hii mpya inaprocess KILA message.
+// ================================================================
+async function handleMessages(
+  conn,
+  chatUpdate,
+  isOwnerFlag
+) {
+  try {
+    const messages =
+      Array.isArray(chatUpdate?.messages)
+        ? chatUpdate.messages
+        : [];
+
+    if (!messages.length) return;
+
+    for (const mek of messages) {
+      try {
+        await handleSingleMessage(
+          conn,
+          mek,
+          isOwnerFlag
+        );
+      } catch (error) {
+        logger.error(
+          `Message processing error: ${error.message}`
+        );
+      }
+    }
+  } catch (error) {
+    logger.error(
+      `Error in handleMessages: ${error.message}`
+    );
+  }
+}
+
+// ================================================================
 // GROUP PARTICIPANT UPDATE
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-async function handleGroupParticipantUpdate(conn, update) {
+// ================================================================
+async function handleGroupParticipantUpdate(
+  conn,
+  update
+) {
   try {
-    logger.info(`Group update: ${update.id} (${update.action})`);
+    logger.info(
+      `Group update: ${update.id} (${update.action})`
+    );
 
     try {
-      const { antiLeftWatcher } = require('./plugins/group/antileft');
-      await antiLeftWatcher(conn, update);
+      const {
+        antiLeftWatcher
+      } =
+        require(
+          './plugins/group/antileft'
+        );
+
+      await antiLeftWatcher(
+        conn,
+        update
+      );
     } catch (e) {
-      console.log('[ANTILEFT] Hook error:', e.message);
+      console.log(
+        '[ANTILEFT] Hook error:',
+        e.message
+      );
     }
 
     try {
-      const { antiPromoteWatcher } = require('./plugins/group/antipromote');
-      await antiPromoteWatcher(conn, update);
+      const {
+        antiPromoteWatcher
+      } =
+        require(
+          './plugins/group/antipromote'
+        );
+
+      await antiPromoteWatcher(
+        conn,
+        update
+      );
     } catch (e) {
-      console.log('[ANTIPROMOTE] Hook error:', e.message);
+      console.log(
+        '[ANTIPROMOTE] Hook error:',
+        e.message
+      );
     }
 
     try {
-      const { antiDemoteWatcher } = require('./plugins/group/antidemote');
-      await antiDemoteWatcher(conn, update);
+      const {
+        antiDemoteWatcher
+      } =
+        require(
+          './plugins/group/antidemote'
+        );
+
+      await antiDemoteWatcher(
+        conn,
+        update
+      );
     } catch (e) {
-      console.log('[ANTIDEMOTE] Hook error:', e.message);
+      console.log(
+        '[ANTIDEMOTE] Hook error:',
+        e.message
+      );
     }
 
     try {
-      const groupEvents = require('./lib/groupevents');
-      await groupEvents.handleParticipantsEvent(conn, update);
+      const groupEvents =
+        require(
+          './lib/groupevents'
+        );
+
+      await groupEvents.handleParticipantsEvent(
+        conn,
+        update
+      );
     } catch (e) {
-      console.log('[GROUPEVENTS] Hook error:', e.message);
+      console.log(
+        '[GROUPEVENTS] Hook error:',
+        e.message
+      );
     }
 
     try {
-      const groupGuard = require('./plugins/group/group5');
-      await groupGuard.guardParticipants(conn, update);
+      const groupGuard =
+        require(
+          './plugins/group/group5'
+        );
+
+      await groupGuard.guardParticipants(
+        conn,
+        update
+      );
     } catch (e) {
-      console.log('[GROUPGUARD] Hook error:', e.message);
+      console.log(
+        '[GROUPGUARD] Hook error:',
+        e.message
+      );
     }
   } catch (error) {
-    logger.error(`Group update error: ${error.message}`);
+    logger.error(
+      `Group update error: ${error.message}`
+    );
   }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// GROUP METADATA UPDATE (name/description/settings/icon)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-async function handleGroupMetadataUpdate(conn, updates) {
+// ================================================================
+// GROUP METADATA UPDATE
+// ================================================================
+async function handleGroupMetadataUpdate(
+  conn,
+  updates
+) {
   try {
-    const groupEvents = require('./lib/groupevents');
-    await groupEvents.handleMetadataEvent(conn, updates);
+    const groupEvents =
+      require(
+        './lib/groupevents'
+      );
+
+    await groupEvents.handleMetadataEvent(
+      conn,
+      updates
+    );
   } catch (error) {
-    logger.error(`Group metadata update error: ${error.message}`);
+    logger.error(
+      `Group metadata update error: ${error.message}`
+    );
   }
 }
 
